@@ -13,7 +13,7 @@ const msToRelativeTime = (ms) => {
     if (months < 24) return `${months} months`;
     const years = Math.round(days / 365.2422);
     return `${years} years`;
-}
+};
 
 const secsToTimestamp = secs => {
     const hours = Math.floor(secs / 3600);
@@ -23,7 +23,7 @@ const secsToTimestamp = secs => {
         return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-}
+};
 
 // Function to round a number to a specified number of decimal places
 // but remove trailing zeros and convert to integer if possible
@@ -31,7 +31,7 @@ const roundSmart = (num, maxDecimals = 2) => {
     let fixed = num.toFixed(maxDecimals);
     fixed = fixed.replace(/\.?0+$/, '').replace(/\.$/, '');
     return parseFloat(fixed);
-}
+};
 
 // Function to round a number based on its size
 const toFixedSmart = (num) => {
@@ -46,7 +46,7 @@ const toFixedSmart = (num) => {
 
 // Function to format bytes into a human-readable string
 const formatBytes = bytes => {
-    const units = [ 'B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB' ];
+    const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'];
     let i = 0;
     while (bytes >= 1024 && i < units.length - 1) {
         bytes /= 1024;
@@ -130,17 +130,17 @@ const showModal = (options) => {
 };
 
 const starGradientPoints = [
-    { stars: 0, color: [ 128, 128, 128 ] },
-    { stars: 0.0999, color: [ 128, 128, 128 ] },
-    { stars: 0.1, color: [ 64, 146, 250 ] },
-    { stars: 2, color: [ 78, 255, 214 ] },
-    { stars: 2.5, color: [ 121, 255, 88 ] },
-    { stars: 3.3, color: [ 245, 240, 92 ] },
-    { stars: 4, color: [ 250, 156, 104 ] },
-    { stars: 5, color: [ 246, 79, 120 ] },
-    { stars: 6, color: [ 179, 76, 193 ] },
-    { stars: 6.7, color: [ 99, 98, 220 ] },
-    { stars: 9, color: [ 0, 0, 0 ] }
+    { stars: 0, color: [128, 128, 128] },
+    { stars: 0.0999, color: [128, 128, 128] },
+    { stars: 0.1, color: [64, 146, 250] },
+    { stars: 2, color: [78, 255, 214] },
+    { stars: 2.5, color: [121, 255, 88] },
+    { stars: 3.3, color: [245, 240, 92] },
+    { stars: 4, color: [250, 156, 104] },
+    { stars: 5, color: [246, 79, 120] },
+    { stars: 6, color: [179, 76, 193] },
+    { stars: 6.7, color: [99, 98, 220] },
+    { stars: 9, color: [0, 0, 0] }
 ];
 
 const starsToColor = stars => {
@@ -158,7 +158,7 @@ const starsToColor = stars => {
         }
     }
     return 'rgb(128, 128, 128)';
-}
+};
 
 const isElementOverflowing = (el) => {
     const styles = window.getComputedStyle(el);
@@ -168,7 +168,7 @@ const isElementOverflowing = (el) => {
         styles.whiteSpace === 'nowrap' &&
         el.scrollWidth > el.clientWidth
     );
-}
+};
 
 const elSearchCard = document.querySelector('#search');
 const elSearchScroller = document.querySelector('#search .scroller');
@@ -282,7 +282,7 @@ const getResultMapsetElement = (mapset) => {
     for (const map of mapset.beatmaps) {
         diffsByMode[map.mode].push(map);
     }
-    for (const [ mode, diffs ] of Object.entries(diffsByMode)) {
+    for (const [mode, diffs] of Object.entries(diffsByMode)) {
         if (diffs.length === 0) continue;
         const elMode = document.createElement('div');
         elMode.classList.add('mode');
@@ -457,13 +457,13 @@ const showSelection = mapset => {
             elSelection.style.display = 'none';
         }, 300);
     });
-}
+};
 
-const refreshSearch = async(debounce = false) => {
+const refreshSearch = async (debounce = false) => {
     clearTimeout(searchTimeout);
     elSearchCard.classList.add('loading');
     elSearchStatus.innerText = `Searching...`;
-    searchTimeout = setTimeout(async() => {
+    searchTimeout = setTimeout(async () => {
         // Fetch data
         const params = new URLSearchParams();
         const query = qs.get('q') || '';
@@ -557,7 +557,7 @@ const refreshSearch = async(debounce = false) => {
                         class: 'alt'
                     }
                 ]
-            })
+            });
         });
         // Create nav and add it to header and footer
         const page = cursor.prev.length + 1;
@@ -577,7 +577,7 @@ const refreshSearch = async(debounce = false) => {
         `;
         const elNavHeader = elResultsHeader.appendChild(elNav.cloneNode(true));
         const elNavFooter = elResultsFooter.appendChild(elNav.cloneNode(true));
-        for (const elNav of [ elNavHeader, elNavFooter ]) {
+        for (const elNav of [elNavHeader, elNavFooter]) {
             const btnNavPrev = elNav.querySelector('#prevPage');
             const btnNavNext = elNav.querySelector('#nextPage');
             btnNavPrev.addEventListener('click', () => {
@@ -626,7 +626,7 @@ const updateOption = (key, value, refresh = true) => {
             newOrder = parts.pop();
             newSort = parts.join('_');
         } else {
-            const descSorts = [ 'ranked', 'playcount', 'playcount_weekly', 'relevance' ];
+            const descSorts = ['ranked', 'playcount', 'playcount_weekly', 'relevance'];
             newSort = value;
             newOrder = descSorts.includes(newSort) ? 'desc' : 'asc';
         }
@@ -664,7 +664,7 @@ const updateOption = (key, value, refresh = true) => {
             }
         }
     }
-    
+
     if (refresh) {
         searchPageReset();
         refreshSearch();
@@ -672,7 +672,7 @@ const updateOption = (key, value, refresh = true) => {
 };
 
 const initOptions = () => {
-    for (let [ key, defaultValue ] of Object.entries(options)) {
+    for (let [key, defaultValue] of Object.entries(options)) {
         const els = document.querySelectorAll(`[data-opt-name="${key}"]`);
         if (!els.length) continue;
         for (const el of els) {
@@ -705,7 +705,7 @@ inputQuery.addEventListener('input', (e) => {
 });
 inputQuery.value = qs.get('q') || '';
 
-btnAdvancedFilters.addEventListener('click', async() => {
+btnAdvancedFilters.addEventListener('click', async () => {
     const res = await axios.get('/assets/filter-guide.md');
     const md = res.data;
     const html = marked.parse(md);
@@ -749,7 +749,7 @@ document.querySelector('#dmca').addEventListener('click', () => {
         actions: [
             { label: 'Okay' }
         ]
-    })
+    });
 });
 
 let tooltip;
