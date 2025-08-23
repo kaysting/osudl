@@ -9,7 +9,7 @@ const config = require('../config.json');
 
 const downloadsDir = path.resolve('./downloads');
 
-(async() => {
+(async () => {
 
     const ids = (
         await db.all(
@@ -69,8 +69,8 @@ const downloadsDir = path.resolve('./downloads');
             downloadPath: tempDir
         });
         // Download the mapset
-        console.log(`Starting download of mapset ${mapsetId}...`);
         const url = `https://osu.ppy.sh/beatmapsets/${mapsetId}/download`;
+        console.log(`Starting download from ${url}...`);
         await page.evaluate(url => {
             const a = document.createElement('a');
             a.href = url;
@@ -174,12 +174,12 @@ const downloadsDir = path.resolve('./downloads');
             watcher.close();
             fs.rmSync(tempDir, { recursive: true });
             reject(new Error(`Download timed out for mapset ${mapsetId}`));
-        }, 30*1000);
+        }, 60 * 1000);
     });
 
     if (fs.existsSync(downloadsDir))
         fs.rmSync(downloadsDir, { recursive: true });
-    const downloadTimes = [ Date.now() ];
+    const downloadTimes = [Date.now()];
     for (let i = 0; i < ids.length; i++) {
         try {
             const id = ids[i];
@@ -191,7 +191,7 @@ const downloadsDir = path.resolve('./downloads');
             const msPerDownload = (downloadTimes[downloadTimes.length - 1] - downloadTimes[0]) / downloadTimes.length;
             const remainingDownloads = ids.length - (i + 1);
             const msLeft = msPerDownload * remainingDownloads;
-            console.log(`Progress: ${i+1}/${ids.length} maps downloaded, done in ${utils.msToRelativeTime(msLeft).toLowerCase()}`);
+            console.log(`Progress: ${i + 1}/${ids.length} maps downloaded, done in ${utils.msToRelativeTime(msLeft).toLowerCase()}`);
         } catch (error) {
             console.error(error);
             await utils.sendDiscordAlert(`<@322141003123523584> Error downloading mapset ${ids[i]}: ${error.message}`);
@@ -202,7 +202,7 @@ const downloadsDir = path.resolve('./downloads');
 
     await browser.close();
     process.exit();
-    
+
 })();
 
 process.on('SIGINT', async () => {
