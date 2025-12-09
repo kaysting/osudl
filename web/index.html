@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>osu!dl</title>
     <meta property="og:site_name" content="osu!dl" />
     <meta property="og:title" content="Search, filter, and bulk download osu! beatmapsets" />
-    <meta property="og:description" content="Your one-stop shop for searching, filtering, and bulk downloading osu! beatmapsets. Stay up-to-date with our archive of all ranked and loved mapsets, available for single or bulk ZIP download!" />
+    <meta property="og:description"
+        content="Your one-stop shop for searching, filtering, and bulk downloading osu! beatmapsets. Stay up-to-date with our archive of all ranked and loved mapsets, available for single or bulk ZIP download!" />
     <meta name="twitter:card" content="summary_large_image">
     <meta property="og:image" content="/assets/demo.png" />
     <meta name="twitter:image" content="/assets/demo.png">
@@ -15,8 +17,11 @@
     <!-- CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0" />
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/assets/index.css">
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/axios@1/dist/axios.min.js"></script>
@@ -25,6 +30,7 @@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
     <script src="/assets/index.js" defer></script>
 </head>
+
 <body>
     <div id="main">
         <div id="topbar">
@@ -58,10 +64,14 @@
                             <div class="type">
                                 <div class="label">Prefer downloads</div>
                                 <div class="options">
-                                    <button class="btn transparent" data-opt-name="preferVidDownloads" data-opt-value="true" title="Include background videos in beatmap downloads when available.">
+                                    <button class="btn transparent" data-opt-name="preferVidDownloads"
+                                        data-opt-value="true"
+                                        title="Include background videos in beatmap downloads when available.">
                                         <span class="label">With video</span>
                                     </button>
-                                    <button class="btn transparent" data-opt-name="preferVidDownloads" data-opt-value="false" title="Exclude background videos from beatmap downloads. Useful if you have videos disabled ingame and/or want to save space.">
+                                    <button class="btn transparent" data-opt-name="preferVidDownloads"
+                                        data-opt-value="false"
+                                        title="Exclude background videos from beatmap downloads. Useful if you have videos disabled ingame and/or want to save space.">
                                         <span class="label">Without video</span>
                                     </button>
                                 </div>
@@ -84,20 +94,24 @@
                                     <button class="btn transparent" data-opt-name="sort" data-opt-value="bpm">
                                         <span class="label">BPM</span>
                                     </button>
-                                    <button class="btn transparent" data-opt-name="sort" data-opt-value="playcount" title="Total play count across all mapset difficulties">
+                                    <button class="btn transparent" data-opt-name="sort" data-opt-value="playcount"
+                                        title="Total play count across all mapset difficulties">
                                         <span class="label">Total plays</span>
                                     </button>
-                                    <button class="btn transparent" data-opt-name="sort" data-opt-value="playcount_weekly" title="Total play count across all mapset difficulties over the last 7 days">
+                                    <button class="btn transparent" data-opt-name="sort"
+                                        data-opt-value="playcount_weekly"
+                                        title="Total play count across all mapset difficulties over the last 7 days">
                                         <span class="label">Weekly plays</span>
                                     </button>
-                                    <button class="btn transparent" data-opt-name="sort" data-opt-value="max_nomod_pp" title="Maximum achievable pp value with no mods applied">
+                                    <button class="btn transparent" data-opt-name="sort" data-opt-value="max_nomod_pp"
+                                        title="Maximum achievable pp value with no mods applied">
                                         <span class="label">Max pp</span>
                                     </button>
                                     <button class="btn transparent" data-opt-name="sort" data-opt-value="ranked">
                                         <span class="label">Date ranked</span>
                                     </button>
                                     <button class="btn transparent" data-opt-name="sort" data-opt-value="relevancy">
-                                        <span class="label">Relevancy</span>
+                                        <span class="label">Relevance</span>
                                     </button>
                                 </div>
                             </div>
@@ -171,4 +185,5 @@
         </div>
     </div>
 </body>
+
 </html>
