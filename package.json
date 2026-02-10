@@ -1,12 +1,22 @@
 {
   "name": "osudl-dev",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
+  "description": "Filter and bulk download osu! beatmaps!",
+  "main": "app/web/index.js",
+  "scripts": {
+    "start": "node app/web/index.js",
+    "webserver": "node app/web/index.js",
+    "updater": "node app/updater/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kaysting/osudl.git"
+  },
+  "imports": {
+    "#env": "./config/env.js",
+    "#db": "./database/db.js",
+    "#utils": "./lib/utils.js",
+    "#lib/*": "./lib/*"
   },
   "keywords": [],
   "author": "Kayla Kersting",
@@ -15,10 +25,16 @@
   "bugs": {
     "url": "https://github.com/kaysting/osudl/issues"
   },
-  "homepage": "https://github.com/kaysting/osudl#readme",
+  "homepage": "https://osudl.org",
   "dependencies": {
     "archiver": "^7.0.1",
+    "axios": "^1.13.5",
     "better-sqlite3": "^12.6.2",
-    "express": "^5.2.1"
+    "cli-color": "^2.0.4",
+    "dayjs": "^1.11.19",
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "tar": "^7.5.7",
+    "unbzip2-stream": "^1.4.3"
   }
 }
