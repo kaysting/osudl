@@ -24,13 +24,9 @@ const applyMigrations = () => {
             .sort();
 
         // Get the last applied migration
-        // If an error is thrown here, we can assume the misc table doesn't exist,
-        // indicating that the db needs a full init (run through all migrations) anyway
-        let latestAppliedMigration = '';
-        try {
-            latestAppliedMigration =
-                db.prepare(`SELECT value FROM misc WHERE key = 'latest_applied_migration'`).get()?.value || '';
-        } catch (error) {}
+        // readMiscData will return null on error or nonexistence, in which case
+        // we can assume all migrations need to be applied
+        const latestAppliedMigration = utils.readMiscData('latest_applied_migration');
 
         // Get pending migration files
         const pendingMigrations = fileNames.filter(f => f > latestAppliedMigration);
@@ -49,9 +45,7 @@ const applyMigrations = () => {
                 db.exec(sql);
 
                 // Update latest applied migration immediately to prevent reapplication on failure after this
-                db.prepare(`INSERT OR REPLACE INTO misc (key, value) VALUES ('latest_applied_migration', ?)`).run(
-                    fileName
-                );
+                utils.writeMiscData('latest_applied_migration', fileName);
             }
         })();
     } catch (error) {
