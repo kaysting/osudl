@@ -1,0 +1,24 @@
+{
+  "name": "osudl-dev",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kaysting/osudl.git"
+  },
+  "keywords": [],
+  "author": "Kayla Kersting",
+  "license": "Apache-2.0",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/kaysting/osudl/issues"
+  },
+  "homepage": "https://github.com/kaysting/osudl#readme",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "better-sqlite3": "^12.6.2",
+    "express": "^5.2.1"
+  }
+}
