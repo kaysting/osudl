@@ -21,7 +21,7 @@ const DOWNLOAD_DIR = path.join(env.ROOT, 'temp/downloads');
 
 const MAP_DOWNLOAD_URL_TEMPLATE = `https://osu.ppy.sh/beatmapsets/{mapset_id}/download`;
 //const MAP_DOWNLOAD_URL_TEMPLATE = `http://localhost:8727/files/beatmapsets/{mapset_id}?video=true`;
-const MS_DELAY_BETWEEN_DOWNLOADS = 0;
+const MS_DELAY_BETWEEN_DOWNLOADS = 5000;
 
 const importMapsets = async mapsetIds => {
     utils.log(`Importing ${mapsetIds.length} mapsets...`);
