@@ -27,6 +27,10 @@
   },
   "homepage": "https://osudl.org",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.987.0",
+    "@aws-sdk/lib-storage": "^3.987.0",
+    "@aws-sdk/node-http-handler": "^3.370.0",
+    "adm-zip": "^0.5.16",
     "archiver": "^7.0.1",
     "axios": "^1.13.5",
     "better-sqlite3": "^12.6.2",
@@ -34,6 +38,8 @@
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
+    "install": "^0.13.0",
+    "npm": "^11.9.0",
     "tar": "^7.5.7",
     "unbzip2-stream": "^1.4.3"
   }

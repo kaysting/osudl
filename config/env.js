@@ -22,8 +22,10 @@ env.OSU_CLIENT_SECRET = process.env.OSU_CLIENT_SECRET;
  */
 env.OSU_SESSION_COOKIE = process.env.OSU_SESSION_COOKIE;
 
-/** The S3 endpoint URL, including the bucket name. */
+/** The S3 endpoint URL, excluding the bucket name. */
 env.S3_ENDPOINT = process.env.S3_ENDPOINT;
+/** S3 bucket name. */
+env.S3_BUCKET = process.env.S3_BUCKET;
 /** S3 access key. */
 env.S3_ACCESS_KEY = process.env.S3_ACCESS_KEY;
 /** S3 secret key. */
@@ -40,6 +42,8 @@ env.S3_REGION = process.env.S3_REGION || 'auto';
  * Needs to be true for some S3 servers.
  */
 env.S3_FORCE_PATH_STYLE = process.env.S3_FORCE_PATH_STYLE === 'true';
+/** The base URL used for serving S3 public object links */
+env.S3_PUBLIC_BASE_URL = process.env.S3_PUBLIC_BASE_URL;
 
 env.PORT = process.env.PORT || 8080;
 

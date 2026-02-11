@@ -8,11 +8,11 @@ CREATE TABLE
         'language' TEXT NOT NULL,
         'genre' TEXT NOT NULL,
         'tags' TEXT NOT NULL,
-        'status' TEXT NOT NULL,
+        'status' INTEGER NOT NULL,
         'time_submitted' INTEGER NOT NULL,
         'time_ranked' INTEGER NOT NULL,
         'has_video' INTEGER NOT NULL,
-        'has_audio' INTEGER NOT NULL, -- 0 only when DMCA'd
+        'is_download_disabled' INTEGER NOT NULL,
         'is_nsfw' INTEGER NOT NULL,
         -- Storage details left null until stored
         'novideo_s3_key' TEXT,
@@ -30,7 +30,7 @@ CREATE TABLE
         'beatmapset_id' INTEGER NOT NULL,
         'version' TEXT NOT NULL,
         'mode' INTEGER NOT NULL, -- 0 = osu, 1 = taiko, 2 = catch, 3 = mania
-        'status' TEXT NOT NULL,
+        'status' INTEGER NOT NULL,
         'total_length' INTEGER NOT NULL,
         'stars' REAL NOT NULL,
         'bpm' REAL NOT NULL,
@@ -38,6 +38,9 @@ CREATE TABLE
         'ar' REAL NOT NULL,
         'od' REAL NOT NULL,
         'hp' REAL NOT NULL,
+        'count_circles' INTEGER NOT NULL,
+        'count_sliders' INTEGER NOT NULL,
+        'count_spinners' INTEGER NOT NULL,
         PRIMARY KEY ('id')
     );
 
@@ -45,7 +48,7 @@ CREATE INDEX idx_beatmaps_set_id ON beatmaps (beatmapset_id);
 
 CREATE INDEX idx_sets_status_time ON beatmapsets (status, time_ranked DESC);
 
-CREATE INDEX idx_sets_has_audio ON beatmapsets (has_audio);
+CREATE INDEX idx_sets_is_download_disabled ON beatmapsets (is_download_disabled);
 
 CREATE INDEX idx_sets_is_nsfw ON beatmapsets (is_nsfw);
 
