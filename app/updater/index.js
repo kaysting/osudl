@@ -4,9 +4,7 @@ const fs = require('fs');
 const axios = require('axios');
 const tar = require('tar');
 const bz2 = require('unbzip2-stream');
-const admZip = require('adm-zip');
 const dayjs = require('dayjs');
-const archiver = require('archiver');
 const { pipeline } = require('stream/promises');
 const db = require('#db');
 const utils = require('#utils');
@@ -19,11 +17,20 @@ dayjs.extend(require('dayjs/plugin/relativeTime'));
 const DUMP_DIR = path.join(env.ROOT, 'temp/dump');
 const DOWNLOAD_DIR = path.join(env.ROOT, 'temp/downloads');
 
+// Adjust these to change where maps are downloaded from
+// {mapset_id} is replaced with the target mapset ID
 const MAP_DOWNLOAD_URL_TEMPLATE = `https://osu.ppy.sh/beatmapsets/{mapset_id}/download`;
-//const MAP_DOWNLOAD_URL_TEMPLATE = `http://localhost:8727/files/beatmapsets/{mapset_id}?video=true`;
 const MS_DELAY_BETWEEN_DOWNLOADS = 5000;
 
+/**
+ * Given a list of beatmapset IDs, download their files from osu! (or another mirror),
+ * create a copy and strip video files if the map has videos, upload the resulting files to S3,
+ * and save map data and S3 keys to the database.
+ * @param {number[]} mapsetIds A list of mapset IDs to import
+ * @returns The number of successfully imported mapsets
+ */
 const importMapsets = async mapsetIds => {
+    if (!mapsetIds || mapsetIds.length == 0) return 0;
     utils.log(`Importing ${mapsetIds.length} mapsets...`);
 
     // Prepare insert statements
@@ -121,6 +128,10 @@ const importMapsets = async mapsetIds => {
 
     for (const id of mapsetIds) {
         try {
+            // Get existing data for later
+            const existingMapset = db.prepare(`SELECT * FROM beatmapsets WHERE id = ?`).get(id);
+            const existingMaps = db.prepare(`SELECT * FROM beatmaps WHERE beatmapset_id = ?`).all(id);
+
             // Fetch mapset data
             utils.log(`Fetching data for mapset ${id}`);
             const mapset = await osu.getBeatmapset(id);
@@ -174,8 +185,16 @@ const importMapsets = async mapsetIds => {
                                 responseType: 'stream',
                                 maxRedirects: 5,
                                 headers: {
+                                    // osu requires this for some reason
                                     Referer: `https://osu.ppy.sh/beatmapsets/${id}`,
-                                    Cookie: `osu_session=${env.OSU_SESSION_COOKIE}`,
+
+                                    // Only include osu session cookie if we're downloading from osu
+                                    // This prevents mirrors from getting our session
+                                    Cookie: MAP_DOWNLOAD_URL_TEMPLATE.includes('osu.ppy.sh')
+                                        ? `osu_session=${env.OSU_SESSION_COOKIE}`
+                                        : '',
+
+                                    // Set user agent and accept headers to mimic a real browser
                                     'User-Agent':
                                         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0',
                                     Accept: `text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7`
@@ -227,85 +246,70 @@ const importMapsets = async mapsetIds => {
 
                     // Zip the frankenstein mapset
                     baseOszPath = path.join(DOWNLOAD_DIR, `${id}.osz`);
-                    const writeStream = fs.createWriteStream(baseOszPath);
-                    const zipper = archiver('zip');
-                    const waitForClose = new Promise((resolve, reject) => {
-                        writeStream.on('close', resolve);
-                        writeStream.on('error', reject);
-                    });
-                    zipper.pipe(writeStream);
-                    zipper.directory(mapFilesDir, false);
-                    zipper.finalize();
-                    await waitForClose;
+                    utils.zipDir(mapFilesDir, baseOszPath);
 
                     // Delete unzipped files
                     fs.rmSync(mapFilesDir, { recursive: true, force: true });
                 }
 
                 if (entry.beatmapset.has_video && !entry.beatmapset.is_download_disabled) {
-                    utils.log(`Removing video files from downloaded map...`);
                     // Prepare extraction folder
                     const extractDir = path.join(DOWNLOAD_DIR, id.toString());
                     if (fs.existsSync(extractDir)) fs.rmSync(extractDir, { force: true, recursive: true });
                     fs.mkdirSync(extractDir, { recursive: true });
 
-                    // Unzip the file
-                    const unzipper = new admZip(baseOszPath);
-                    unzipper.extractAllTo(extractDir);
+                    try {
+                        utils.log(`Removing video files from downloaded map...`);
+                        // Unzip the file
+                        utils.unzip(baseOszPath, extractDir);
 
-                    // Recurse through extracted map files and delete video files
-                    const videoExtensions = [
-                        'webm',
-                        'mp4',
-                        'avi',
-                        'mov',
-                        'mkv',
-                        'flv',
-                        'wmv',
-                        '3gp',
-                        '3g2',
-                        'm4v',
-                        'mpg',
-                        'mpeg',
-                        'ogv'
-                    ];
-                    let didDeleteVideos = false;
-                    const recurse = dir => {
-                        const fileNames = fs.readdirSync(dir);
-                        for (const name of fileNames) {
-                            const filePath = path.join(dir, name);
-                            const stats = fs.statSync(filePath);
-                            // Recurse and continue if file is a directory
-                            if (stats.isDirectory()) {
-                                recurse(filePath);
-                                continue;
+                        // Recurse through extracted map files and delete video files
+                        const videoExtensions = [
+                            'webm',
+                            'mp4',
+                            'avi',
+                            'mov',
+                            'mkv',
+                            'flv',
+                            'wmv',
+                            '3gp',
+                            '3g2',
+                            'm4v',
+                            'mpg',
+                            'mpeg',
+                            'ogv'
+                        ];
+                        let didDeleteVideos = false;
+                        const recurse = dir => {
+                            const fileNames = fs.readdirSync(dir);
+                            for (const name of fileNames) {
+                                const filePath = path.join(dir, name);
+                                const stats = fs.statSync(filePath);
+                                // Recurse and continue if file is a directory
+                                if (stats.isDirectory()) {
+                                    recurse(filePath);
+                                    continue;
+                                }
+                                // If file is a video, delete it
+                                const ext = filePath.split('.').pop().toLowerCase();
+                                if (videoExtensions.includes(ext)) {
+                                    fs.rmSync(filePath, { force: true });
+                                    didDeleteVideos = true;
+                                }
                             }
-                            // If file is a video, delete it
-                            const ext = filePath.split('.').pop().toLowerCase();
-                            if (videoExtensions.includes(ext)) {
-                                fs.rmSync(filePath, { force: true });
-                                didDeleteVideos = true;
-                            }
+                        };
+                        recurse(extractDir);
+
+                        // Re-zip the file and save the novideo path only if we actually deleted video files
+                        if (didDeleteVideos) {
+                            noVideoOszPath = path.join(DOWNLOAD_DIR, `${id}-novideo.osz`);
+                            utils.zipDir(extractDir, noVideoOszPath);
                         }
-                    };
-                    recurse(extractDir);
-
-                    // Re-zip the file and save the novideo path only if we actually deleted video files
-                    if (didDeleteVideos) {
-                        noVideoOszPath = path.join(DOWNLOAD_DIR, `${id}-novideo.osz`);
-                        const noVideoWriteStream = fs.createWriteStream(noVideoOszPath);
-                        const zipper = archiver('zip');
-                        const waitForClose = new Promise((resolve, reject) => {
-                            noVideoWriteStream.on('close', resolve);
-                            noVideoWriteStream.on('error', reject);
-                        });
-                        zipper.pipe(noVideoWriteStream);
-                        zipper.directory(extractDir, false);
-                        zipper.finalize();
-                        await waitForClose;
+                    } catch (error) {
+                        utils.logErr(`Map video stripping failed:`, error);
                     }
 
-                    // Delete extracted files
+                    // Delete extraction folder
                     fs.rmSync(extractDir, { force: true, recursive: true });
                 }
 
@@ -374,6 +378,9 @@ const importMapsets = async mapsetIds => {
     return countProcessed;
 };
 
+/**
+ * Download and extract mapset IDs from monthly data.ppy.sh database dumps and import all maps that we don't have saved.
+ */
 const importFromDump = async () => {
     try {
         // Only download dump if we don't already have it or if it's been over a day since we downloaded it
@@ -382,7 +389,7 @@ const importFromDump = async () => {
             // Create dump folder
             if (fs.existsSync(DUMP_DIR)) fs.rmSync(DUMP_DIR, { recursive: true, force: true });
             fs.mkdirSync(DUMP_DIR, { recursive: true });
-            utils.log(`Dump will be saved in ${DUMP_DIR}`);
+            utils.log(`Starting download dump to ${DUMP_DIR}...`);
 
             // Start download and get stream
             const firstOfTheMonth = dayjs().set('D', 1);
@@ -454,10 +461,6 @@ const importFromDump = async () => {
             utils.log(`No missing mapsets were found in the dump`);
         }
 
-        // Optimize
-        utils.log('Optimizing FTS index...');
-        db.prepare("INSERT INTO map_search(map_search) VALUES('optimize')").run();
-
         // Save last dump import time
         if (mapsetIdsToSave.length == countSaved) {
             utils.writeMiscData('last_dump_import_time', Date.now());
@@ -469,9 +472,75 @@ const importFromDump = async () => {
     }
 };
 
+/**
+ * Use osu's search beatmaps API to work backwards from the most recently ranked maps,
+ * importing any that aren't saved until we don't find any more unsaved maps.
+ */
+const importFromRecents = async () => {
+    try {
+        let cursor = null;
+        const unsavedMapsetIds = [];
+        while (true) {
+            // Fetch mapsets
+            const data = await osu.searchBeatmapsets({
+                cursor_string: cursor,
+                sort: 'ranked_desc',
+                nsfw: true
+            });
+
+            // Extract data
+            cursor = data.cursor_string;
+            const mapsets = data.beatmapsets;
+
+            // Loop through mapsets
+            let foundUnsavedMapsets = false;
+            for (const mapset of mapsets) {
+                // Skip if we already have this mapset
+                const existingMapset = db.prepare(`SELECT 1 FROM beatmapsets WHERE id = ? LIMIT 1`).get(mapset.id);
+                if (existingMapset) continue;
+
+                // Make note of unsaved ID
+                unsavedMapsetIds.push(mapset.id);
+                foundUnsavedMapsets = true;
+            }
+
+            // We're done if no more mapsets, or we didn't find any new ones above
+            // foundUnsavedMapsets is only false if all of the mapsets in this batch are already saved
+            if (!cursor || mapsets.length === 0 || !foundUnsavedMapsets) {
+                break;
+            }
+        }
+
+        if (unsavedMapsetIds.length == 0) {
+            utils.log(`Found no new maps to import`);
+            return;
+        }
+
+        // Reverse list of IDs so we import the newest ones last
+        unsavedMapsetIds.reverse();
+
+        // Import unsaved mapsets
+        await importMapsets(unsavedMapsetIds);
+    } catch (error) {
+        utils.logErr(`Error while importing recently ranked mapsets:`, error);
+    }
+};
+
+/**
+ * Using osu's get beatmaps API, fetch data for all saved maps and re-import them if their data has changed.
+ */
+const scanForChanges = async () => {
+    const savedMapsetIds = new Set(
+        db
+            .prepare(`SELECT id FROM beatmapsets`)
+            .all()
+            .map(e => e.id)
+    );
+};
+
 (async () => {
-    // Import maps from dump if it's been over a month since the last import
     const runImport = async () => {
+        // Import maps from dump if it's been over a month since the last import
         const lastImportTime = parseInt(utils.readMiscData('last_dump_import_time') || '0');
         const oneMonth = 1000 * 60 * 60 * 24 * 30;
         if (Date.now() - lastImportTime > oneMonth) {
@@ -480,7 +549,26 @@ const importFromDump = async () => {
         setTimeout(runImport, 1000 * 60 * 60 * 24);
     };
 
+    const runRecents = async () => {
+        if (utils.readMiscData('last_dump_import_time')) {
+            await importFromRecents();
+        }
+        setTimeout(runRecents, 1000 * 60);
+    };
+
+    const runScan = async () => {
+        if (utils.readMiscData('last_dump_import_time')) {
+            await importFromRecents();
+            setTimeout(runRecents, 1000 * 60 * 60 * 24);
+        } else {
+            setTimeout(runRecents, 1000 * 60);
+        }
+    };
+
+    // Start processes
     runImport();
+    runRecents();
+    utils.log(`Started update processes`);
 })();
 
 utils.initGracefulShutdown(() => {
