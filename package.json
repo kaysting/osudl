@@ -4,7 +4,6 @@
   "description": "Filter and bulk download osu! beatmaps!",
   "main": "app/web/index.js",
   "scripts": {
-    "start": "node app/web/index.js",
     "webserver": "node app/web/index.js",
     "updater": "node app/updater/index.js"
   },
@@ -16,6 +15,7 @@
     "#env": "./config/env.js",
     "#db": "./database/db.js",
     "#utils": "./lib/utils.js",
+    "#api": "./lib/api.js",
     "#lib/*": "./lib/*"
   },
   "keywords": [],
@@ -30,6 +30,7 @@
     "@aws-sdk/client-s3": "^3.987.0",
     "@aws-sdk/lib-storage": "^3.987.0",
     "@aws-sdk/node-http-handler": "^3.370.0",
+    "@aws-sdk/s3-request-presigner": "^3.988.0",
     "archiver": "^7.0.1",
     "axios": "^1.13.5",
     "better-sqlite3": "^12.6.2",
