@@ -40,10 +40,14 @@ const runRecentScan = async () => {
 };
 
 (async () => {
+    // Start these immediately
     runImport();
     runRecents();
-    runFullScan();
     runRecentScan();
+
+    // Delay these
+    setTimeout(runFullScan, 1000 * 60 * 60);
+
     utils.log(`Started update processes`);
 })();
 

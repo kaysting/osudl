@@ -30,7 +30,7 @@ const applyMigrations = () => {
         try {
             latestAppliedMigration = db
                 .prepare(`SELECT value FROM misc WHERE key = 'latest_applied_migration'`)
-                .run()?.value;
+                .get()?.value;
         } catch (error) {
             // Assume db isn't initialized
         }
