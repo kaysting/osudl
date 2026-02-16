@@ -16,6 +16,7 @@
     "#db": "./database/db.js",
     "#utils": "./lib/utils.js",
     "#api": "./lib/api.js",
+    "#api/*": "./lib/api/*",
     "#lib/*": "./lib/*"
   },
   "keywords": [],

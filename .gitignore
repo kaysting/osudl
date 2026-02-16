@@ -1,5 +1,8 @@
 /node_modules
 /temp
-/.env
 *.db
 *.db-*
+
+.*
+!.prettierrc
+!.gitignore
