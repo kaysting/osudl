@@ -1,20 +1,20 @@
 const db = require('#db');
 const utils = require('#utils');
-const api = require('#api');
+const ingest = require('#api/ingest.js');
 
 // Import maps from dump if it's been over a month since the last import
 const runImport = async () => {
     const lastImportTime = parseInt(utils.readMiscData('last_dump_import_time') || '0');
     const oneMonth = 1000 * 60 * 60 * 24 * 30;
     if (Date.now() - lastImportTime > oneMonth) {
-        await api.importFromDump();
+        await ingest.importFromDump();
     }
     setTimeout(runImport, 1000 * 60 * 60 * 24);
 };
 
 const runRecents = async () => {
     if (utils.readMiscData('last_dump_import_time')) {
-        await api.importFromRecents();
+        await ingest.importFromRecents();
     }
     setTimeout(runRecents, 1000 * 60);
 };
@@ -22,7 +22,7 @@ const runRecents = async () => {
 // Check all saved maps against the osu API for changes
 const runFullScan = async () => {
     if (utils.readMiscData('last_dump_import_time')) {
-        await api.scanForChanges();
+        await ingest.scanForChanges();
         setTimeout(runFullScan, 1000 * 60 * 60 * 24);
     } else {
         setTimeout(runFullScan, 1000 * 60);
@@ -34,7 +34,7 @@ const runFullScan = async () => {
 const runRecentScan = async () => {
     if (utils.readMiscData('last_dump_import_time')) {
         const oneWeekAgo = Date.now() - 1000 * 60 * 60 * 24 * 7;
-        await api.scanForChanges(oneWeekAgo);
+        await ingest.scanForChanges(oneWeekAgo);
     }
     setTimeout(runRecentScan, 1000 * 60 * 15);
 };
