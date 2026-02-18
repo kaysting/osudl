@@ -11,6 +11,11 @@ app.use((req, res, next) => {
     // Get IP from headers or req.ip
     const ip = req.headers['cf-connecting-ip'] || req.ip;
 
+    // Build logging function
+    req.log = (...args) => {
+        utils.log(ip, req.method, `${req.originalUrl}:`, ...args);
+    };
+
     // Log request including processing time
     const START_TIME = process.hrtime.bigint();
     const originalEnd = res.end;
@@ -31,6 +36,9 @@ app.use(express.json());
 
 // Register routes
 app.use('/', require('./routes/direct'));
+app.use('/', require('./routes/home'));
+app.use('/beatmapsets', require('./routes/beatmaps'));
+app.use('/packs', require('./routes/packs'));
 
 // Handle 404s
 app.use((req, res) => {
