@@ -4,8 +4,8 @@
   "description": "Filter and bulk download osu! beatmaps!",
   "main": "app/web/index.js",
   "scripts": {
-    "webserver": "node app/web/index.js",
-    "updater": "node app/updater/index.js"
+    "webserver": "node apps/web/index.js",
+    "updater": "node apps/updater/index.js"
   },
   "repository": {
     "type": "git",
