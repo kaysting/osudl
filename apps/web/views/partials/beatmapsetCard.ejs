@@ -1,0 +1,81 @@
+<div class="beatmapsetCard rounded-16 overflow-hidden flex">
+    <div class="left p-relative flex-no-shrink flex align-center justify-center">
+        <img
+            class="listImage p-absolute w-full h-full object-cover"
+            src="https://assets.ppy.sh/beatmaps/<%= beatmapset.id %>/covers/list.jpg"
+            onError="this.onerror=null; this.src='/assets/images/beatmap-cover-fallback.png';"
+            loading="lazy" />
+        <button
+            class="controls btn p-absolute w-full rounded-0"
+            onClick="audioButtonClick(event, `https://b.ppy.sh/preview/<%= beatmapset.id %>.mp3`)">
+            <span class="icon filled">play_arrow</span>
+        </button>
+    </div>
+    <div class="right flex-grow flex">
+        <div class="content p-relative rounded-16 overflow-hidden flex col gap-8 flex-grow justify-center">
+            <img
+                class="coverImage p-absolute w-full h-full object-cover"
+                src="https://assets.ppy.sh/beatmaps/<%= beatmapset.id %>/covers/cover.jpg"
+                onError="this.onerror=null; this.src='/assets/images/beatmap-cover-fallback.png';"
+                loading="lazy" />
+            <div class="coverDimming p-absolute w-full h-full"></div>
+            <div class="text p-relative flex-grow">
+                <div
+                    class="title overflow-hidden text-ellipsis nowrap"
+                    title="<%= beatmapset.title %>"
+                    data-tooltip-overflow="true">
+                    <%= beatmapset.title %>
+                </div>
+                <div
+                    class="artist overflow-hidden text-ellipsis nowrap"
+                    title="<%= beatmapset.artist %>"
+                    data-tooltip-overflow="true">
+                    <%= beatmapset.artist %>
+                </div>
+                <div class="details flex row gap-8 align-center overflow-hidden text-ellipsis nowrap">
+                    <span class="mapper overflow-hidden text-ellipsis nowrap">Mapped by <%= beatmapset.mapper %></span>
+                </div>
+            </div>
+            <div class="flex gap-12 align-center">
+                <div class="beatmapStatus p-relative rounded-16 flex-no-shrink <%= beatmapset.status_name %>">
+                    <%= beatmapset.status_name.toUpperCase() %>
+                </div>
+                <!-- prettier-ignore -->
+                <%
+                    const mapsByMode = {};
+                    for (const map of beatmapset.beatmaps) {
+                        if (!mapsByMode[map.mode_name]) mapsByMode[map.mode_name] = [];
+                        mapsByMode[map.mode_name].push(map);
+                    }
+                %>
+                <div class="p-relative beatmaps flex gap-8 align-center flex-grow">
+                    <% for (const mode in mapsByMode) { %>
+                    <div class="mode flex gap-8 align-center">
+                        <img src="/assets/images/ruleset-icons/<%= mode %>.svg" class="icon flex-no-shrink" />
+                        <% if (beatmapset.beatmaps.length > 20) { %>
+                        <div class="count"><%= mapsByMode[mode].length %></div>
+                        <% } else { %>
+                        <div class="swatches flex gap-1">
+                            <% for (const beatmap of mapsByMode[mode]) { %>
+                            <span
+                                title="<%= beatmap.version %>"
+                                class="beatmap flex-no-shrink"
+                                style="background: <%= beatmap.difficulty_color.bg %>"></span>
+                            <% } %>
+                        </div>
+                        <% } %>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        <div class="buttons flex col justify-evenly align-center flex-no-shrink">
+            <a href="/s/<%= beatmapset.id %>" class="btn square text" target="_blank" title="Download">
+                <div class="icon">download</div>
+            </a>
+            <a href="osu://s/<%= beatmapset.id %>" class="btn square text" title="osu!direct">
+                <div class="icon">rocket_launch</div>
+            </a>
+        </div>
+    </div>
+</div>

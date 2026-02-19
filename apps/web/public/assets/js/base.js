@@ -1,0 +1,342 @@
+// Use the sharing api or clipboard write to share text
+const copyText = async text => {
+    try {
+        await navigator.clipboard.writeText(text);
+        showPopup('Text copied!', `<pre><code>${text}</code></pre>`, [{ label: 'Okay' }]);
+    } catch (err) {
+        showPopup(
+            'Clipboard copy failed',
+            `<p>We couldn't copy the text for you, so you'll have to do it yourself:</p>
+        <pre><code>${text}</code></pre>`,
+            [{ label: 'Close' }]
+        );
+        console.error('Error copying to clipboard:', err);
+    }
+};
+
+const showPopup = (title, body, actions = [], options = {}) => {
+    const { closedby = 'any', width = '', height = '', onBeforeShow = () => {}, onClose = () => {} } = options;
+
+    // Build base dialog element
+    const dialog = document.createElement('dialog');
+    if (width) dialog.style.setProperty(`--width`, `${width}px`);
+    if (height) dialog.style.setProperty(`--height`, `${height}px`);
+    dialog.innerHTML = /*html*/ `
+        <h2 class="title"></h2>
+        <section class="body"></section>
+        <section class="actions"></section>
+    `;
+    dialog.setAttribute('closedby', closedby);
+    dialog.classList.add('popup');
+
+    // Function to close with animation
+    const close = async () => {
+        try {
+            await onClose();
+        } catch (error) {
+            console.error(error);
+        }
+        dialog.classList.remove('visible');
+        setTimeout(() => {
+            dialog.close();
+            document.body.removeChild(dialog);
+        }, 200);
+    };
+    dialog.closeWithAnimation = close;
+
+    // Populate dialog
+    dialog.querySelector('.title').innerText = title;
+
+    // Populate body
+    if (typeof body === 'string') {
+        dialog.querySelector('.body').innerHTML = body;
+    } else {
+        dialog.querySelector('.body').appendChild(body);
+    }
+
+    // Populate actions
+    if (actions?.length) {
+        const actionsContainer = dialog.querySelector('.actions');
+        for (const action of actions) {
+            const btn = document.createElement(action.href ? 'a' : 'button');
+            btn.classList = `btn medium ${action.class || ''}`;
+            if (action.class == 'primary') btn.autofocus = true;
+            btn.innerText = action.label;
+            if (action.href) {
+                btn.href = action.href;
+                if (action.newTab) {
+                    btn.target = '_blank';
+                }
+            }
+            btn.addEventListener('click', event => {
+                if (action.onClick) action.onClick(dialog);
+                if (action.noClose) return;
+                close();
+            });
+            actionsContainer.appendChild(btn);
+        }
+    }
+
+    // Show dialog
+    document.body.appendChild(dialog);
+    dialog.showModal();
+    dialog.addEventListener('toggle', async e => {
+        if (!dialog.open) return; // return if closed
+        if (onBeforeShow) {
+            try {
+                const success = await onBeforeShow(dialog);
+                if (success === false) throw new Error(`Dialog's onBeforeShow function returned false, aborting`);
+            } catch (error) {
+                console.error(error);
+                dialog.remove();
+                return;
+            }
+        }
+        setTimeout(() => {
+            dialog.classList.add('visible');
+        }, 10);
+    });
+
+    // Handle cancelling
+    dialog.addEventListener('cancel', e => {
+        e.preventDefault();
+        close();
+    });
+
+    return dialog;
+};
+
+// Tooltip logic written entirely by Gemimi
+const initCustomTooltips = () => {
+    const tooltip = document.createElement('div');
+    tooltip.id = 'custom-tooltip';
+
+    // 1. PROMOTE TO TOP LAYER
+    // This allows the tooltip to float above native <dialog> elements
+    tooltip.popover = 'manual';
+    tooltip.style.margin = '0'; // Prevent default user-agent margins from affecting math
+
+    document.body.appendChild(tooltip);
+
+    let currentTarget = null;
+
+    const showTooltip = (target, text) => {
+        // RESET to defaults (Single line mode)
+        tooltip.style.whiteSpace = 'nowrap';
+        tooltip.style.width = 'auto';
+        tooltip.style.top = '0px';
+        tooltip.style.left = '0px';
+        tooltip.style.removeProperty('--arrow-x');
+        tooltip.style.removeProperty('--arrow-y');
+
+        // Set text
+        const finalText = text.replaceAll('\\n', '<br>');
+        tooltip.innerHTML = finalText;
+
+        // 2. SHOW POPOVER (Renders it to DOM so we can measure it)
+        tooltip.showPopover();
+        tooltip.classList.add('visible');
+
+        // MEASURE natural width
+        let tooltipRect = tooltip.getBoundingClientRect();
+
+        // CONDITIONAL WRAPPING
+        const maxWidth = 350;
+        if (tooltipRect.width > maxWidth) {
+            tooltip.style.whiteSpace = 'normal';
+            tooltip.style.width = `${maxWidth}px`;
+            tooltipRect = tooltip.getBoundingClientRect(); // Re-measure height
+        }
+
+        const targetRect = target.getBoundingClientRect();
+        const arrowSize = 6;
+        const gap = 6;
+        const padding = 10;
+
+        // DETERMINE PLACEMENT
+        const spaceTop = targetRect.top;
+        const spaceBottom = window.innerHeight - targetRect.bottom;
+        const spaceLeft = targetRect.left;
+        const spaceRight = window.innerWidth - targetRect.right;
+
+        let placement = 'top';
+
+        if (spaceTop < tooltipRect.height + gap + arrowSize && spaceBottom > tooltipRect.height + gap + arrowSize) {
+            placement = 'bottom';
+        } else if (spaceTop < tooltipRect.height + gap + arrowSize && spaceRight > tooltipRect.width + gap) {
+            placement = 'right';
+        } else if (spaceTop < tooltipRect.height + gap + arrowSize && spaceLeft > tooltipRect.width + gap) {
+            placement = 'left';
+        }
+
+        let top, left;
+
+        // CALCULATE COORDINATES
+        if (placement === 'top' || placement === 'bottom') {
+            top = placement === 'top' ? targetRect.top - tooltipRect.height - gap : targetRect.bottom + gap;
+
+            left = targetRect.left + targetRect.width / 2 - tooltipRect.width / 2;
+
+            const minX = padding;
+            const maxX = window.innerWidth - tooltipRect.width - padding;
+            const clampedLeft = Math.max(minX, Math.min(left, maxX));
+
+            const targetCenter = targetRect.left + targetRect.width / 2;
+            let arrowX = targetCenter - clampedLeft;
+            arrowX = Math.max(8, Math.min(arrowX, tooltipRect.width - 8));
+
+            left = clampedLeft;
+            tooltip.style.setProperty('--arrow-x', `${Math.round(arrowX)}px`);
+        } else {
+            left = placement === 'left' ? targetRect.left - tooltipRect.width - gap : targetRect.right + gap;
+
+            top = targetRect.top + targetRect.height / 2 - tooltipRect.height / 2;
+
+            const minY = padding;
+            const maxY = window.innerHeight - tooltipRect.height - padding;
+            const clampedTop = Math.max(minY, Math.min(top, maxY));
+
+            const targetCenterY = targetRect.top + targetRect.height / 2;
+            let arrowY = targetCenterY - clampedTop;
+            arrowY = Math.max(8, Math.min(arrowY, tooltipRect.height - 8));
+
+            top = clampedTop;
+            tooltip.style.setProperty('--arrow-y', `${Math.round(arrowY)}px`);
+        }
+
+        // Apply final position
+        tooltip.style.top = `${Math.round(top)}px`;
+        tooltip.style.left = `${Math.round(left)}px`;
+        tooltip.setAttribute('data-placement', placement);
+    };
+
+    // Listeners
+    document.addEventListener('mouseover', e => {
+        const target = e.target.closest('[title], [data-tooltip]');
+        if (!target) return;
+        if (currentTarget === target) return;
+
+        // Swap title to data-tooltip
+        if (target.hasAttribute('title')) {
+            const text = target.getAttribute('title');
+            if (!text.trim()) return;
+            target.setAttribute('data-tooltip', text);
+            target.removeAttribute('title');
+        }
+
+        // Overflow Logic
+        if (target.hasAttribute('data-tooltip-overflow')) {
+            const range = document.createRange();
+            range.selectNodeContents(target);
+            const textWidth = range.getBoundingClientRect().width;
+            const style = window.getComputedStyle(target);
+            const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+            const contentWidth = target.clientWidth - padding;
+            if (textWidth <= contentWidth + 1) return;
+        }
+
+        // Show Tooltip
+        const text = target.getAttribute('data-tooltip');
+        if (text) {
+            currentTarget = target;
+            showTooltip(target, text);
+        }
+    });
+
+    document.addEventListener('mouseout', e => {
+        const target = e.target.closest('[data-tooltip]');
+        if (target && target === currentTarget) {
+            tooltip.classList.remove('visible');
+
+            // 3. CLEAN UP POPOVER
+            // Wait for CSS transition (opacity) to finish before removing from DOM
+            setTimeout(() => {
+                if (!tooltip.classList.contains('visible')) {
+                    tooltip.hidePopover();
+                }
+            }, 200);
+
+            currentTarget = null;
+        }
+    });
+
+    window.addEventListener(
+        'scroll',
+        () => {
+            if (tooltip.classList.contains('visible')) {
+                tooltip.classList.remove('visible');
+                tooltip.hidePopover();
+                currentTarget = null;
+            }
+        },
+        { capture: true, passive: true }
+    );
+};
+
+// Handle image load states
+const initImageLoadStates = (parent = document) => {
+    const images = parent.querySelectorAll('img');
+    images.forEach(img => {
+        if (img.complete) {
+            img.classList.add('loaded');
+        } else {
+            img.addEventListener('load', () => {
+                img.classList.add('loaded');
+            });
+        }
+    });
+};
+
+// Handle applying svg icon image masks
+const initSvgIconMasks = () => {
+    document.querySelectorAll('img.icon.mask').forEach(img => {
+        const src = img.getAttribute('src');
+        img.style.webkitMaskImage = `url(${src})`;
+        img.style.maskImage = `url(${src})`;
+    });
+};
+
+// Update dynamic timestamp elements
+const updateTimestampElements = () => {
+    const els = [...document.querySelectorAll('[data-timestamp]')];
+    els.forEach(el => {
+        // Get timestamp
+        let ts = el.dataset.timestamp;
+
+        // If timestamp is all numbers, parse it as an int
+        if (ts.match(/^\d+$/)) {
+            ts = parseInt(ts);
+        }
+
+        // Get formats and templates
+        const displayFormat = el.dataset.format || `YYYY-MM-DD [at] H:mm`;
+        const displayTemplate = el.dataset.template || `{time}`;
+        const titleFormat = el.dataset.formatTitle || `YYYY-MM-DD [at] H:mm`;
+        const titleTemplate = el.dataset.titleTemplate || `{time}`;
+
+        // Update element
+        try {
+            const date = dayjs(ts);
+            el.title = titleTemplate.replace('{time}', date.format(titleFormat));
+            el.innerText = displayTemplate.replace('{time}', date.format(displayFormat));
+        } catch (error) {
+            console.error(`Failed to update dynamic timestamp element:`, el, error);
+        }
+    });
+};
+setInterval(updateTimestampElements, 1000);
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    initCustomTooltips();
+    initImageLoadStates();
+    initSvgIconMasks();
+    updateTimestampElements();
+});
+
+// Re-initialize on page update
+document.addEventListener('page:updated', e => {
+    initImageLoadStates();
+    initSvgIconMasks();
+    updateTimestampElements();
+});

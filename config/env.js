@@ -45,7 +45,14 @@ env.S3_FORCE_PATH_STYLE = process.env.S3_FORCE_PATH_STYLE === 'true';
 /** The base URL used for serving S3 public object links */
 env.S3_PUBLIC_BASE_URL = process.env.S3_PUBLIC_BASE_URL;
 
+/** Webserver part */
 env.PORT = process.env.PORT || 8080;
+/** Whether or not the server is accessible over HTTPS */
+env.HTTPS = process.env.HTTPS ? true : false;
+/** The host that leads to the webserver */
+env.HOST = process.env.HOST || `localhost:${env.PORT}`;
+/** The base URL compiled from PORT, HTTPS, and HOST */
+env.BASE_URL = `http${env.HTTPS ? 's' : ''}://${env.HOST}`;
 
 let isMissingRequired = false;
 for (const [key, value] of Object.entries(env)) {

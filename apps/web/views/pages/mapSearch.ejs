@@ -1,0 +1,13 @@
+<div class="card">
+    <div class="beatmapsetCardContainer">
+        <!-- prettier-ignore -->
+        <% for (const beatmapset of results) { %>
+            <%- include('../partials/beatmapsetCard', { beatmapset }) %>
+        <% } %>
+    </div>
+</div>
+<style>
+    body[data-page='mapSearch'] main {
+        width: 100%;
+    }
+</style>

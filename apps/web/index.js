@@ -27,16 +27,51 @@ app.use((req, res, next) => {
         return originalEnd.apply(this, args);
     };
 
+    // Request renderer
+    res.renderPage = (page, data) => {
+        res.render('layout', {
+            page,
+            ...data
+        });
+    };
+
     next();
 });
 
-// Register other middleware
-app.use(express.static(path.join(env.ROOT, 'app/web/public')));
-app.use(express.json());
+// Pass stuff into EJS
+app.locals.utils = utils;
+app.locals.asset = (pathRel, returnAbsolute = false) => {
+    pathRel = pathRel.replace(/^\/+/g, ''); // remove leading slash for append
+    const filePath = path.join(__dirname, 'public', pathRel);
+    const baseUrl = returnAbsolute ? env.BASE_URL : '';
+    try {
+        const stats = fs.statSync(filePath);
+        const mtime = stats.mtime.getTime();
+        return `${baseUrl}/${pathRel}?v=${mtime}`;
+    } catch (error) {
+        return `${baseUrl}/${pathRel}`;
+    }
+};
+
+// Set up rendering
+app.set('view engine', 'ejs');
+app.set('views', path.join(env.ROOT, 'apps/web/views'));
+
+// Register middleware
+app.use(express.static(path.join(env.ROOT, 'apps/web/public')));
+app.use(
+    express.json({
+        verify: (req, res, buf) => {
+            req.rawBody = buf; // Store raw bytes for later
+        }
+    })
+);
+app.use(express.urlencoded({ extended: true }));
 
 // Register routes
 app.use('/', require('./routes/direct'));
 app.use('/', require('./routes/home'));
+app.use('/', require('./routes/redirects'));
 app.use('/beatmapsets', require('./routes/beatmaps'));
 app.use('/packs', require('./routes/packs'));
 

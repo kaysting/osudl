@@ -3,7 +3,12 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    res.end(`Not implemented, check back later`);
+    res.renderPage('home', {
+        topbar: {
+            icon: 'home',
+            title: 'osu!dl'
+        }
+    });
 });
 
 module.exports = router;
