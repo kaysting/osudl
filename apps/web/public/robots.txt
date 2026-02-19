@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /b/*
+Disallow: /s/*
+Disallow: /packs/*/download
+Disallow: /packs/*/download/*
+Disallow: /packs/*/download/*/beatmapset/*

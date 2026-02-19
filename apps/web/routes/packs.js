@@ -29,10 +29,14 @@ const ensureDownloadExists = (req, res, next) => {
 };
 
 // Pack list
-router.get('/', async (req, res) => {});
+router.get('/', async (req, res) => {
+    res.end(`Not implemented, check back later`);
+});
 
 // Pack info page
-router.get('/:packId', ensurePackExists, async (req, res) => {});
+router.get('/:packId', ensurePackExists, async (req, res) => {
+    res.end(`Not implemented, check back later`);
+});
 
 // Paginated JSON map data list
 // Used on the download page to show progress for each map
@@ -141,7 +145,27 @@ router.get(
     '/:packId/download/:downloadId/beatmapset/:mapsetId',
     ensurePackExists,
     ensureDownloadExists,
-    async (req, res) => {}
+    async (req, res) => {
+        // Get inputs
+        const includeVideo = req.query.video === 'false' ? false : true;
+        const isRetry = req.query.retry === 'true' ? true : false;
+        const mapsetId = req.params.mapsetId;
+
+        // Get map download URL from S3
+        const url = await downloadsApi.getBeatmapsetDownloadUrl(mapsetId, includeVideo);
+        if (!url) {
+            return res.status(404).end(`Download for ${mapsetId} couldn't be found`);
+        }
+
+        // Update download instance and pack entries if this isn't a retry
+        if (!isRetry) {
+            packsApi.incrementPackDownloadInstanceMapCount(req.downloadInstance.id);
+            packsApi.incrementPackDownloadCountWithInstance(req.downloadInstance.id);
+        }
+
+        // Redirect to the download
+        res.redirect(url);
+    }
 );
 
 module.exports = router;

@@ -3,7 +3,7 @@ const api = require('#api');
 
 const router = express.Router();
 
-const unsavedText = `- If the map is newly ranked, we probably just haven't stored it yet, so check back in a few minutes.\n- If the map is ranked and old, please join the Discord server and let us know so we can add it.\n\nWe only mirror ranked/approved/loved maps.`;
+const unsavedText = `- If the map is newly ranked, we probably haven't stored it yet, so check back in a few minutes.\n- If the map is ranked and old, please join the Discord server and let us know so we can add it.\n\nWe only mirror ranked/approved/loved maps.`;
 
 // Accepts map ID and redirects to presigned mapset download
 router.get('/b/:id', async (req, res) => {
