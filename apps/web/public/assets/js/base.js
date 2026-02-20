@@ -332,11 +332,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initImageLoadStates();
     initSvgIconMasks();
     updateTimestampElements();
-});
 
-// Re-initialize on page update
-document.addEventListener('page:updated', e => {
-    initImageLoadStates();
-    initSvgIconMasks();
-    updateTimestampElements();
+    // Re-initialize on page update
+    document.body.addEventListener('htmx:afterSettle', e => {
+        initImageLoadStates();
+        initSvgIconMasks();
+        updateTimestampElements();
+    });
 });

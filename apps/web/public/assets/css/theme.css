@@ -48,9 +48,9 @@
 
 body {
     /* Color settings */
-    --base-hue: 250;
+    --base-hue: 240;
     --base-sat: 10%;
-    --accent-hue: 250;
+    --accent-hue: 240;
     --accent-sat: 60%;
 
     /* Base colors */
@@ -221,17 +221,17 @@ thead {
 }
 
 th {
-    background: hsl(220, 20%, 25%);
+    background: var(--c-base-25);
     color: white;
     font-weight: 600;
 }
 
 tr:nth-child(even) {
-    background: hsl(220, 20%, 15%);
+    background: var(--c-base-15);
 }
 
 tr:nth-child(even) {
-    background: hsl(220, 20%, 20%);
+    background: var(--c-base-20);
 }
 
 td {
@@ -394,7 +394,7 @@ label {
 
 hr {
     border: none;
-    border-top: 1px solid hsl(220, 20%, 30%);
+    border-top: 1px solid var(--c-base-30);
     margin: 24px 0px;
 }
 
@@ -403,7 +403,7 @@ img {
 }
 
 ::selection {
-    background: var(--c-accent-60);
+    background: var(--c-accent-70);
     color: black;
 }
 
@@ -416,7 +416,7 @@ img {
 .btn {
     --btnBg: var(--c-base-30);
     --btnBgHover: var(--c-base-40);
-    --btnFg: hsl(220, 20%, 85%);
+    --btnFg: var(--c-base-85);
     --btnFgHover: white;
     height: 32px;
     padding: 0px 12px;
@@ -459,9 +459,9 @@ img {
 
 .btn.primary {
     --btnBg: var(--c-accent-60);
-    --btnBgHover: var(--c-accent-75);
-    --btnFg: var(--c-base-10);
-    --btnFgHover: var(--c-base-12);
+    --btnBgHover: var(--c-accent-65);
+    --btnFg: var(--c-base-100);
+    --btnFgHover: var(--c-base-100);
 }
 
 .btn.translucent {
@@ -473,8 +473,8 @@ img {
 
 .btn.text {
     --btnBg: transparent;
-    --btnBgHover: hsl(220, 20%, 25%);
-    --btnFg: hsl(220, 20%, 80%);
+    --btnBgHover: var(--c-base-25);
+    --btnFg: var(--c-base-80);
     --btnFgHover: white;
 }
 
@@ -487,7 +487,7 @@ img {
 }
 
 .btn.accent {
-    --btnFg: var(--c-accent-60);
+    --btnFg: var(--c-accent-80);
 }
 
 .btn.text.danger {
@@ -588,6 +588,7 @@ img {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    line-height: 1.3;
 }
 
 .btn .icon.filled {
@@ -652,7 +653,7 @@ img {
 }
 
 .textbox:focus-within {
-    box-shadow: 0 0 0 2px var(--c-accent-60);
+    box-shadow: 0 0 0 2px var(--c-accent-65);
 }
 
 .textbox.medium {
