@@ -13,7 +13,7 @@
 }
 
 .logo .color {
-    color: var(--c-accent-60);
+    color: var(--c-accent-65);
 }
 
 #sidebar {
@@ -244,14 +244,6 @@
         #sidebar {
             width: var(--sidebarClosedWidth);
         }
-    }
-}
-
-@media (max-width: 900px) {
-    #topbar {
-        flex-direction: column;
-        gap: 8px;
-        justify-content: center;
     }
 }
 
