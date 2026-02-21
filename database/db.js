@@ -10,6 +10,7 @@ const db = new Database(env.DB_PATH);
 
 // Set pragmas
 db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
 db.pragma('busy_timeout = 15000');
 db.pragma('synchronous = NORMAL');
 
