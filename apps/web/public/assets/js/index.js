@@ -60,3 +60,22 @@ const audioVolumeUp = () => {
     let volume = parseFloat(localStorage.getItem('mapPreview')) || 0.5;
     audioVolumeSet(volume + 0.1);
 };
+
+const openBrowserPopup = (url = '', windowName = 'popup', width = 800, height = 600) => {
+    const left = window.innerWidth / 2 - width / 2 + window.screenX;
+    const top = window.innerHeight / 2 - height / 2 + window.screenY;
+    const popup = window.open(url, windowName, `popup=yes,width=${width},height=${height},left=${left},top=${top}`);
+    return popup;
+};
+
+const downloadAllResults = async btn => {
+    // Open popup immediately
+    const popup = openBrowserPopup('', Date.now().toString(), 500, 600);
+
+    // Create pack
+    const query = btn.dataset.query;
+    const res = await axios.post(`/api/json/packs/create?query=${encodeURIComponent(query)}`);
+
+    // Redirect popup
+    popup.location.href = `/packs/${res.data.pack.id}/download`;
+};

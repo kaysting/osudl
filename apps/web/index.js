@@ -69,6 +69,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 
 // Register routes
+app.use('/api/json', require('./routes/apiJson'));
 app.use('/', require('./routes/direct'));
 app.use('/', require('./routes/home'));
 app.use('/', require('./routes/redirects'));
