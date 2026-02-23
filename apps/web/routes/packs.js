@@ -116,7 +116,7 @@ router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownload
             // Get mapset data and build file name
             const mapset = mapsApi.getBeatmapset(mapsetId, false);
             if (!mapset) throw new Error(`Mapset doesn't exist in the database`);
-            const fileName = utils.sanitizeFileName(`${mapsetId} ${mapset.artist} - ${mapset.title}.osz`);
+            const fileName = includeVideo ? mapset.suggested_file_name_video : mapset.suggested_file_name_novideo;
 
             // Get map download URL from S3
             const url = await downloadsApi.getBeatmapsetDownloadUrl(mapsetId, includeVideo);

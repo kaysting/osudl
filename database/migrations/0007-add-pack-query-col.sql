@@ -1,0 +1,2 @@
+ALTER TABLE pack_meta
+ADD COLUMN query TEXT;

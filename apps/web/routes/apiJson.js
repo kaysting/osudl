@@ -12,6 +12,7 @@ router.post('/packs/create', async (req, res) => {
     query = query?.trim();
 
     // If no name is provided but a query is, create a name based on query
+    query = typeof query === 'string' ? query : undefined;
     if (!name && query !== undefined) {
         name = query ? `Maps matching ${query}` : `All maps`;
     }
@@ -23,12 +24,7 @@ router.post('/packs/create', async (req, res) => {
     // but these should become dynamic once users can create packs
     const is_visible = false;
     const creator_id = null;
-    let pack = await api.createPack(name, query !== undefined ? 'query' : 'custom', creator_id, is_visible);
-
-    // Add query if requested
-    if (query !== undefined) {
-        pack = api.addQueryToPack(pack.id, query);
-    }
+    let pack = await api.createPack(name, creator_id, is_visible, query);
 
     // Send resulting pack
     res.json({

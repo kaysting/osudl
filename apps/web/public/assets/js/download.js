@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('download_start', data => {
         window.addEventListener('beforeunload', warnOnUnload);
         $('#controls').style.display = 'none';
-        $('#progress .status').innerText = `Starting download...`;
+        $('#progress .status').innerText = `Starting zip download...`;
     });
 
     // Handle progress
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle completion
     socket.on('download_complete', data => {
-        $('#progress .status').innerText = `Download complete!`;
+        $('#progress .status').innerText = `Zip download complete! Check your browser's downloads.`;
         $('#progress .bar .fill').classList.add('complete');
         $('#progress .bar .fill').style.width = '100%';
         window.removeEventListener('beforeunload', warnOnUnload);
