@@ -42,8 +42,12 @@
     "extract": "^1.0.0",
     "install": "^0.13.0",
     "npm": "^11.9.0",
+    "socket.io": "^4.8.3",
     "tar": "^7.5.7",
     "unbzip2-stream": "^1.4.3",
     "zip": "^1.2.0"
+  },
+  "overrides": {
+    "minimatch": "^10.2.1"
   }
 }

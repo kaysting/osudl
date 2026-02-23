@@ -13,7 +13,7 @@ router.post('/packs/create', async (req, res) => {
 
     // If no name is provided but a query is, create a name based on query
     if (!name && query !== undefined) {
-        name = query ? `Query results: ${query}` : `All maps`;
+        name = query ? `Maps matching ${query}` : `All maps`;
     }
 
     // Ensure name is set

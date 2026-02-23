@@ -4,7 +4,27 @@ const express = require('express');
 const db = require('#db');
 const utils = require('#utils');
 
-const app = express();
+// Start server
+const { app, io } = require('./server');
+
+// Handle socket connections
+io.on('connection', socket => {
+    utils.log(`New socket connection: ${socket.id}`);
+
+    socket.on('disconnect', () => {
+        utils.log(`Socket disconnected: ${socket.id}`);
+    });
+
+    socket.on('subscribe', room => {
+        socket.join(room);
+        utils.log(`Socket ${socket.id} subscribed to room: ${room}`);
+    });
+
+    socket.on('unsubscribe', room => {
+        socket.leave(room);
+        utils.log(`Socket ${socket.id} unsubscribed from room: ${room}`);
+    });
+});
 
 // Register global middleware
 app.use((req, res, next) => {
@@ -85,10 +105,6 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
     utils.logErr(err);
     res.status(500).end(`500 Internal Server Error\nTry again in a bit.`);
-});
-
-app.listen(env.PORT, () => {
-    utils.log(`Webserver listening on port ${env.PORT}`);
 });
 
 utils.initGracefulShutdown(() => {

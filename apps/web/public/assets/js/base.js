@@ -1,3 +1,12 @@
+const $ = (selector, ancestor = document) => ancestor.querySelector(selector);
+const $$ = (selector, ancestor = document) => ancestor.querySelectorAll(selector);
+
+const escapeHTML = string => {
+    const div = document.createElement('div');
+    div.textContent = string;
+    return div.innerHTML;
+};
+
 // Use the sharing api or clipboard write to share text
 const copyText = async text => {
     try {

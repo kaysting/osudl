@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>osu!dl Download - <%= download.pack.name %></title>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="<%= asset('/assets/css/utils.css') %>" />
+        <link rel="stylesheet" href="<%= asset('/assets/css/theme.css') %>" />
+        <link rel="stylesheet" href="<%= asset('/assets/css/download.css') %>" />
+
+        <!-- JS -->
+        <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.8.1/dist/socket.io.min.js"></script>
+        <script src="<%= asset('/assets/js/base.js') %>"></script>
+        <script src="<%= asset('/assets/js/index.js') %>"></script>
+        <script src="<%= asset('/assets/js/download.js') %>"></script>
+    </head>
+    <body data-download-id="<%= download.id %>">
+        <main class="flex col">
+            <div id="topbar" class="flex gap-8 align-center flex-no-shrink">
+                <div id="logo" class="flex-grow">
+                    <span class="white">osu!</span>
+                    <span class="color">dl</span>
+                </div>
+                <div id="packName"><%= download.pack.name %></div>
+            </div>
+            <div id="progress" class="flex col gap-4 flex-no-shrink">
+                <div class="bar">
+                    <div class="fill" style="width: 0%"></div>
+                </div>
+                <div class="status">Ready to download <%= download.pack.map_count.toLocaleString() %> maps!</div>
+            </div>
+            <div id="maps" class="flex-grow flex col gap-2"></div>
+            <div id="controls" class="flex-no-shrink" style="display: none">
+                <div class="section">
+                    <div class="section folderSelect">
+                        <button id="selectFolder" class="btn primary medium">
+                            <span class="icon filled">folder</span>
+                            <span class="label">Select destination folder...</span>
+                        </button>
+                    </div>
+                    <div class="section folderUnsupported">
+                        <div class="text">
+                            <strong>Your browser doesn't support downloading directly to a folder.</strong>
+                        </div>
+                        <div class="text">
+                            Switch to a Chromium-based desktop browser (Chrome, Edge, Opera, etc.), or download the maps
+                            as a zip file below.
+                        </div>
+                    </div>
+                    <div class="section downloadToFolder">
+                        <div class="text">
+                            Download maps to
+                            <span class="folderName">selected folder</span>
+                        </div>
+                        <div class="split">
+                            <button class="btn" data-video="true">
+                                <div class="icon">folder_zip</div>
+                                <div class="label">With videos (<%= utils.formatSize(download.pack.size_video) %>)</div>
+                            </button>
+                            <button class="btn" data-video="false">
+                                <div class="icon">folder_zip</div>
+                                <div class="label">
+                                    Without videos (<%= utils.formatSize(download.pack.size_novideo) %>)
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text zipLabel">Download maps as zip (not recommended):</div>
+                    <div class="text zipLabelAlt">or download maps as zip (not recommended):</div>
+                    <div class="section zip">
+                        <div class="split">
+                            <% const basePath = `/packs/${download.pack.id}/download/${download.id}` %>
+                            <a href="<%= basePath %>/zip?video=true" class="btn" download>
+                                <div class="icon">folder_zip</div>
+                                <div class="label">With videos (<%= utils.formatSize(download.pack.size_video) %>)</div>
+                            </a>
+                            <a href="<%= basePath %>/zip?video=false" class="btn" download>
+                                <div class="icon">folder_zip</div>
+                                <div class="label">
+                                    Without videos (<%= utils.formatSize(download.pack.size_novideo) %>)
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

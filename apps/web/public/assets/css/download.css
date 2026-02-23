@@ -1,0 +1,110 @@
+body {
+    background: var(--c-base-15);
+}
+
+main {
+    width: 100vw;
+    height: 100vh;
+}
+
+#topbar {
+    height: 50px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--c-base-25);
+}
+
+#logo {
+    font-family: 'Torus', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    display: flex;
+    gap: 0px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+#logo .white {
+    color: white;
+}
+
+#logo .color {
+    color: var(--c-accent-65);
+}
+
+#packName {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+#progress,
+#maps {
+    padding: 16px;
+    border-bottom: 1px solid var(--c-base-25);
+}
+
+#maps {
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+#maps .map .icon {
+    font-family: 'Material Symbols Rounded';
+    font-size: 24px;
+    color: hsl(150, 80%, 50%);
+    font-variation-settings: 'FILL' 1;
+}
+
+#maps .map .name {
+    font-size: 15px;
+    color: var(--c-base-90);
+    line-height: 1.2;
+}
+
+#controls {
+    padding: 8px;
+}
+
+#progress .bar {
+    position: relative;
+    overflow: hidden;
+    height: 6px;
+    width: 100%;
+    border-radius: 4px;
+    background: var(--c-base-10);
+}
+
+#progress .bar>.fill {
+    height: 100%;
+    background: var(--c-accent-65);
+    border-radius: 4px;
+}
+
+#progress .bar>.fill.complete {
+    background: hsl(150, 80%, 50%);
+}
+
+#progress .status {
+    font-size: 14px;
+    color: var(--c-base-70);
+}
+
+#controls .text {
+    text-align: center;
+    font-size: 15px;
+    color: var(--c-base-70);
+    line-height: 1.2;
+}
+
+#controls .split {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+}
+
+#controls .section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}

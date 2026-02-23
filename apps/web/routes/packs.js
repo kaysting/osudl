@@ -6,6 +6,8 @@ const packsApi = require('#api/packs.js');
 const mapsApi = require('#api/beatmaps.js');
 const utils = require('#utils');
 
+const { io } = require('../server');
+
 const router = express.Router();
 
 // Middleware to make sure the requested pack exists
@@ -59,13 +61,23 @@ router.get('/:packId/download', ensurePackExists, async (req, res) => {
 
 // Pack download page
 router.get('/:packId/download/:downloadId', ensurePackExists, ensureDownloadExists, async (req, res) => {
-    res.json({ downloadInstance: req.downloadInstance });
+    res.render('download', {
+        download: req.downloadInstance
+    });
 });
 
 // Pack download as streamed zip
 router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownloadExists, async (req, res) => {
     // Get video setting
     const includeVideo = req.query.video === 'false' ? false : true;
+
+    // Emit start event
+    const socketRoomName = `download_${req.downloadInstance.id}`;
+    let startTime = Date.now();
+    io.to(socketRoomName).emit('download_start', {
+        count_maps_total: req.pack.map_count,
+        time_started: startTime
+    });
 
     // Set attachment headers
     const filename = utils.sanitizeFileName(`${req.pack.name}${!includeVideo ? ' (no videos)' : ''}.zip`);
@@ -98,8 +110,14 @@ router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownload
 
     // Loop through pack maps
     const mapsetIds = packsApi.getPackContentsRaw(req.pack.id);
+    console.log(mapsetIds.length);
     for (const mapsetId of mapsetIds) {
         try {
+            // Get mapset data and build file name
+            const mapset = mapsApi.getBeatmapset(mapsetId, false);
+            if (!mapset) throw new Error(`Mapset doesn't exist in the database`);
+            const fileName = utils.sanitizeFileName(`${mapsetId} ${mapset.artist} - ${mapset.title}.osz`);
+
             // Get map download URL from S3
             const url = await downloadsApi.getBeatmapsetDownloadUrl(mapsetId, includeVideo);
 
@@ -112,13 +130,7 @@ router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownload
 
             // Append file to archive stream and wait for it to finish before continuing
             await new Promise((resolve, reject) => {
-                // Get mapset data and build file name
-                const mapset = mapsApi.getBeatmapset(mapsetId, false);
-                if (!mapset) return reject(`Mapset doesn't exist in the database`);
-                const fileName = utils.sanitizeFileName(`${mapsetId} ${mapset.artist} - ${mapset.title}.osz`);
-
                 archive.append(response.data, { name: fileName });
-
                 response.data.on('end', resolve);
                 response.data.on('error', reject);
             });
@@ -127,6 +139,15 @@ router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownload
             packsApi.incrementPackDownloadInstanceMapCount(req.downloadInstance.id);
             packsApi.incrementPackDownloadCountWithInstance(req.downloadInstance.id);
 
+            // Emit socket event
+            io.to(socketRoomName).emit('download_progress', {
+                count_maps_total: req.pack.map_count,
+                count_maps_downloaded: i,
+                percent: (i / req.pack.map_count) * 100,
+                time_started: startTime,
+                file_name: fileName
+            });
+
             i++;
             logProgress();
         } catch (error) {
@@ -134,8 +155,22 @@ router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownload
         }
     }
 
+    // Emit finalizing event
+    io.to(socketRoomName).emit('download_finalize', {
+        count_maps_total: req.pack.map_count,
+        time_started: startTime
+    });
+
+    res.on('finish', () => {
+        // Emit completion event
+        io.to(socketRoomName).emit('download_complete', {
+            count_maps_total: req.pack.map_count,
+            time_started: startTime
+        });
+    });
+
     // Finalize archive
-    archive.finalize();
+    await archive.finalize();
 });
 
 // Redirect to the download for a specific map
