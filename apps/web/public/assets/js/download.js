@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         $('#controls').style.display = 'none';
         $('#progress .bar .fill').style.width = `${data.percent}%`;
         $('#progress .status').innerText =
-            `Downloaded ${data.count_maps_downloaded} / ${data.count_maps_total} mapsets • ${data.percent.toFixed(2)}% complete`;
+            `Downloaded ${data.count_maps_downloaded.toLocaleString()} / ${data.count_maps_total.toLocaleString()} mapsets • ${data.percent.toFixed(2)}% complete`;
         $('#maps').insertAdjacentHTML('afterbegin', getMapEntry(data.file_name));
         if ($('#maps').children.length > 100) {
             $('#maps').removeChild($('#maps').lastChild);
