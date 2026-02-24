@@ -86,15 +86,27 @@
                         <a id="showZipLinks">Download as zip</a>
                         instead (not recommended)
                     </div>
-                    <div class="text zipLabel">Download maps as zip (not recommended):</div>
                     <div class="section zip">
+                        <!-- prettier-ignore -->
+                        <%
+                            const basePath = `/packs/${download.pack.id}/download/${download.id}`;
+                            const isVideoTooBig = download.pack.size_video > env.MAX_ZIP_SIZE;
+                            const isNoVideoTooBig = download.pack.size_novideo > env.MAX_ZIP_SIZE;
+                            const tooBigTitle = `Exceeds maximum zip size of ${utils.formatSize(env.MAX_ZIP_SIZE)}`;
+                        %>
+                        <div class="text zipLabel">Download maps as zip (not recommended):</div>
                         <div class="split">
-                            <% const basePath = `/packs/${download.pack.id}/download/${download.id}` %>
-                            <a href="<%= basePath %>/zip?video=true" class="btn" download>
+                            <a
+                                href="<%= isVideoTooBig ? '' : `${basePath}/zip?video=true` %>"
+                                class="btn <%= isVideoTooBig ? 'disabled' : '' %>"
+                                title="<%= isVideoTooBig ? tooBigTitle : '' %>">
                                 <div class="icon">folder_zip</div>
                                 <div class="label">With videos (<%= utils.formatSize(download.pack.size_video) %>)</div>
                             </a>
-                            <a href="<%= basePath %>/zip?video=false" class="btn" download>
+                            <a
+                                href="<%= isNoVideoTooBig ? '' : `${basePath}/zip?video=false` %>"
+                                class="btn <%= isNoVideoTooBig ? 'disabled' : '' %>"
+                                title="<%= isNoVideoTooBig ? tooBigTitle : '' %>">
                                 <div class="icon">folder_zip</div>
                                 <div class="label">
                                     Without videos (<%= utils.formatSize(download.pack.size_novideo) %>)

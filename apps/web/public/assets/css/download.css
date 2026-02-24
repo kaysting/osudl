@@ -140,7 +140,6 @@ main {
 #controls .section.cancel,
 #controls .text.folderSelectError,
 #controls .text.zipLink,
-#controls .text.zipLabel,
 #controls[data-state="hidden"] {
     display: none;
 }
@@ -153,9 +152,4 @@ main {
 #controls[data-state="folderSelected"] .section.downloadToFolder,
 #controls[data-state="cancel"] .section.cancel {
     display: flex;
-}
-
-#controls[data-state="initForceZip"] .text.zipLabel,
-#controls[data-state="initDirectUnsupported"] .text.zipLabel {
-    display: block;
 }

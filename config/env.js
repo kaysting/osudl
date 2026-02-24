@@ -55,7 +55,7 @@ env.HOST = process.env.HOST || `localhost:${env.PORT}`;
 env.BASE_URL = `http${env.HTTPS ? 's' : ''}://${env.HOST}`;
 
 /** The maximum size in bytes a zip download can be */
-env.MAX_ZIP_SIZE = (process.env.MAX_ZIP_SIZE_GB || 10) * 1024 * 1024 * 1024;
+env.MAX_ZIP_SIZE = (process.env.MAX_ZIP_SIZE_GB || 25) * 1024 * 1024 * 1024;
 
 let isMissingRequired = false;
 for (const [key, value] of Object.entries(env)) {

@@ -59,6 +59,7 @@ app.use((req, res, next) => {
 });
 
 // Pass stuff into EJS
+app.locals.env = env;
 app.locals.utils = utils;
 app.locals.asset = (pathRel, returnAbsolute = false) => {
     pathRel = pathRel.replace(/^\/+/g, ''); // remove leading slash for append
