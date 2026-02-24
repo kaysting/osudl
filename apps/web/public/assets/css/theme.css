@@ -378,6 +378,7 @@ a {
 a:hover {
     color: white;
     text-decoration: underline;
+    cursor: pointer;
 }
 
 small {

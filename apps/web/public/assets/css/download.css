@@ -52,8 +52,21 @@ main {
 #maps .map .icon {
     font-family: 'Material Symbols Rounded';
     font-size: 24px;
-    color: hsl(150, 80%, 50%);
-    font-variation-settings: 'FILL' 1;
+}
+
+#maps .map .icon.downloaded::after {
+    content: 'download';
+    color: hsl(140, 80%, 60%);
+}
+
+#maps .map .icon.skipped::after {
+    content: 'check_circle';
+    color: hsl(200, 80%, 60%);
+}
+
+#maps .map .icon.error::after {
+    content: 'error';
+    color: hsl(340, 80%, 60%);
 }
 
 #maps .map .name {
@@ -79,6 +92,7 @@ main {
     height: 100%;
     background: var(--c-accent-65);
     border-radius: 4px;
+    transition: 0.1s ease-in-out;
 }
 
 #progress .bar>.fill.complete {
@@ -97,6 +111,10 @@ main {
     line-height: 1.2;
 }
 
+#controls .text.danger {
+    color: hsl(340, 80%, 60%);
+}
+
 #controls .split {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -107,4 +125,22 @@ main {
     display: flex;
     flex-direction: column;
     gap: 8px;
+}
+
+#controls .text.folderSelectError,
+#controls .text.zipLink,
+#controls[data-state="initDirect"] .section.folderUnsupported,
+#controls[data-state="initDirect"] .section.downloadToFolder,
+#controls[data-state="initDirect"] .section.zip,
+#controls[data-state="initDirect"] .text.zipLabel,
+#controls[data-state="initDirectUnsupported"] .section.folderSelect,
+#controls[data-state="initDirectUnsupported"] .section.downloadToFolder,
+#controls[data-state="initForceZip"] .section.folderSelect,
+#controls[data-state="initForceZip"] .section.downloadToFolder,
+#controls[data-state="initForceZip"] .section.folderUnsupported,
+#controls[data-state="folderSelected"] .section.folderUnsupported,
+#controls[data-state="folderSelected"] .section.zip,
+#controls[data-state="folderSelected"] .text.zipLabel,
+#controls[data-state="hidden"] {
+    display: none;
 }

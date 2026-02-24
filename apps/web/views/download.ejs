@@ -12,11 +12,15 @@
 
         <!-- JS -->
         <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.8.1/dist/socket.io.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="<%= asset('/assets/js/base.js') %>"></script>
         <script src="<%= asset('/assets/js/index.js') %>"></script>
         <script src="<%= asset('/assets/js/download.js') %>"></script>
     </head>
-    <body data-download-id="<%= download.id %>">
+    <body>
+        <script id="data-download" type="application/json">
+            <%- JSON.stringify(download) %>
+        </script>
         <main class="flex col">
             <div id="topbar" class="flex gap-8 align-center flex-no-shrink">
                 <div id="logo" class="flex-grow">
@@ -32,7 +36,7 @@
                 <div class="status">Ready to download <%= download.pack.map_count.toLocaleString() %> maps!</div>
             </div>
             <div id="maps" class="flex-grow flex col gap-2"></div>
-            <div id="controls" class="flex-no-shrink" style="display: none">
+            <div id="controls" class="flex-no-shrink" data-state="hidden">
                 <div class="section">
                     <div class="section folderSelect">
                         <button id="selectFolder" class="btn primary medium">
@@ -51,7 +55,7 @@
                     </div>
                     <div class="section downloadToFolder">
                         <div class="text">
-                            Download maps to
+                            Start downloading maps to
                             <span class="folderName">selected folder</span>
                         </div>
                         <div class="split">
@@ -67,8 +71,15 @@
                             </button>
                         </div>
                     </div>
+                    <div class="text danger folderSelectError"></div>
+                    <div
+                        class="text zipLink"
+                        title="Zip downloads are slow, unreliable, and expensive for us to provide. We highly recommend using the direct download to folder option if available.">
+                        Not working?
+                        <a id="showZipLinks">Download as zip</a>
+                        instead (not recommended)
+                    </div>
                     <div class="text zipLabel">Download maps as zip (not recommended):</div>
-                    <div class="text zipLabelAlt">or download maps as zip (not recommended):</div>
                     <div class="section zip">
                         <div class="split">
                             <% const basePath = `/packs/${download.pack.id}/download/${download.id}` %>

@@ -7,6 +7,8 @@ const escapeHTML = string => {
     return div.innerHTML;
 };
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 // Use the sharing api or clipboard write to share text
 const copyText = async text => {
     try {

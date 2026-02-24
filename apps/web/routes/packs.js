@@ -7,6 +7,7 @@ const mapsApi = require('#api/beatmaps.js');
 const utils = require('#utils');
 
 const { io } = require('../server');
+const env = require('#env');
 
 const router = express.Router();
 
@@ -45,10 +46,8 @@ router.get('/:packId', ensurePackExists, async (req, res) => {
 router.get('/:packId/beatmapsets', ensurePackExists, async (req, res) => {
     const limit = utils.clamp(parseInt(req.query.limit) || 100, 1, 100);
     const offset = Math.max(parseInt(req.query.offset) || 0, 0);
-    const beatmapsets = packsApi.getPackContents(req.pack.id, limit, offset);
-    res.json({
-        beatmapsets
-    });
+    const result = packsApi.getPackContents(req.pack.id, 'ranked_asc', limit, offset);
+    res.json(result);
 });
 
 // Initialize a pack download
@@ -70,6 +69,14 @@ router.get('/:packId/download/:downloadId', ensurePackExists, ensureDownloadExis
 router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownloadExists, async (req, res) => {
     // Get video setting
     const includeVideo = req.query.video === 'false' ? false : true;
+
+    // Check zip size
+    const packSize = includeVideo ? req.pack.size_video : req.pack.size_novideo;
+    if (packSize > env.MAX_ZIP_SIZE) {
+        return res
+            .status(400)
+            .send(`This zip file would exceed the maximum allowed ZIP size of ${utils.formatSize(env.MAX_ZIP_SIZE)}`);
+    }
 
     // Emit start event
     const socketRoomName = `download_${req.downloadInstance.id}`;
