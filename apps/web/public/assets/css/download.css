@@ -11,6 +11,7 @@ main {
     height: 50px;
     padding: 8px 16px;
     border-bottom: 1px solid var(--c-base-25);
+    background: var(--c-base-18);
 }
 
 #logo {
@@ -47,6 +48,7 @@ main {
 #maps {
     max-height: 100%;
     overflow-y: auto;
+    background: var(--c-base-12);
 }
 
 #maps .map .icon {
@@ -85,7 +87,7 @@ main {
     height: 6px;
     width: 100%;
     border-radius: 4px;
-    background: var(--c-base-10);
+    background: var(--c-base-12);
 }
 
 #progress .bar>.fill {
@@ -95,8 +97,12 @@ main {
     transition: 0.1s ease-in-out;
 }
 
-#progress .bar>.fill.complete {
-    background: hsl(150, 80%, 50%);
+#progress .bar>.fill.success {
+    background: hsl(150, 80%, 60%);
+}
+
+#progress .bar>.fill.danger {
+    background: hsl(340, 80%, 60%);
 }
 
 #progress .status {
@@ -127,20 +133,29 @@ main {
     gap: 8px;
 }
 
+#controls .section.folderUnsupported,
+#controls .section.downloadToFolder,
+#controls .section.folderSelect,
+#controls .section.zip,
+#controls .section.cancel,
 #controls .text.folderSelectError,
 #controls .text.zipLink,
-#controls[data-state="initDirect"] .section.folderUnsupported,
-#controls[data-state="initDirect"] .section.downloadToFolder,
-#controls[data-state="initDirect"] .section.zip,
-#controls[data-state="initDirect"] .text.zipLabel,
-#controls[data-state="initDirectUnsupported"] .section.folderSelect,
-#controls[data-state="initDirectUnsupported"] .section.downloadToFolder,
-#controls[data-state="initForceZip"] .section.folderSelect,
-#controls[data-state="initForceZip"] .section.downloadToFolder,
-#controls[data-state="initForceZip"] .section.folderUnsupported,
-#controls[data-state="folderSelected"] .section.folderUnsupported,
-#controls[data-state="folderSelected"] .section.zip,
-#controls[data-state="folderSelected"] .text.zipLabel,
+#controls .text.zipLabel,
 #controls[data-state="hidden"] {
     display: none;
+}
+
+#controls[data-state="initDirect"] .section.folderSelect,
+#controls[data-state="initDirectUnsupported"] .section.folderUnsupported,
+#controls[data-state="initDirectUnsupported"] .section.zip,
+#controls[data-state="initForceZip"] .section.zip,
+#controls[data-state="folderSelected"] .section.folderSelect,
+#controls[data-state="folderSelected"] .section.downloadToFolder,
+#controls[data-state="cancel"] .section.cancel {
+    display: flex;
+}
+
+#controls[data-state="initForceZip"] .text.zipLabel,
+#controls[data-state="initDirectUnsupported"] .text.zipLabel {
+    display: block;
 }

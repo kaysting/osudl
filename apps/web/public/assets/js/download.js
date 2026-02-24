@@ -19,25 +19,28 @@ const updateUI = (event, data = {}) => {
         log_status: 'downloaded',
         ...data
     };
-    $('#controls').dataset.state = 'hidden';
     switch (event) {
         case 'zip_starting': {
+            $('#controls').dataset.state = 'hidden';
             window.addEventListener('beforeunload', warnOnUnload);
             $('#progress .status').innerText = `Starting zip download...`;
             break;
         }
         case 'direct_starting': {
+            $('#controls').dataset.state = 'hidden';
             window.addEventListener('beforeunload', warnOnUnload);
             $('#progress .status').innerText = `Starting download...`;
             break;
         }
         case 'progress': {
+            $('#controls').dataset.state = 'cancel';
             $('#progress .bar .fill').style.width = `${data.percent}%`;
             $('#progress .status').innerText =
                 `Downloaded ${data.count_maps_downloaded.toLocaleString()} / ${data.count_maps_total.toLocaleString()} mapsets • ${data.percent.toFixed(2)}% complete`;
             break;
         }
         case 'log': {
+            $('#controls').dataset.state = 'cancel';
             const statusTooltip = {
                 downloaded: 'Downloaded',
                 skipped: 'Skipped, already exists',
@@ -56,21 +59,38 @@ const updateUI = (event, data = {}) => {
             break;
         }
         case 'zip_finalizing': {
-            $('#progress .bar .fill').style.width = '100%';
+            $('#controls').dataset.state = 'hidden';
             $('#progress .status').innerText = `Finalizing zip...`;
+            $('#controls').dataset.state = 'hidden';
             break;
         }
         case 'zip_completed': {
+            $('#controls').dataset.state = 'hidden';
             $('#progress .status').innerText = `Zip download complete! Check your browser's downloads.`;
-            $('#progress .bar .fill').classList.add('complete');
+            $('#progress .bar .fill').classList.add('success');
             $('#progress .bar .fill').style.width = '100%';
             window.removeEventListener('beforeunload', warnOnUnload);
             break;
         }
         case 'direct_completed': {
-            $('#progress .status').innerText = `Downloads complete!`;
-            $('#progress .bar .fill').classList.add('complete');
+            $('#controls').dataset.state = 'hidden';
+            $('#progress .status').innerText = `Download complete!`;
+            $('#progress .bar .fill').classList.add('success');
             $('#progress .bar .fill').style.width = '100%';
+            window.removeEventListener('beforeunload', warnOnUnload);
+            break;
+        }
+        case 'cancelled': {
+            $('#controls').dataset.state = 'hidden';
+            $('#progress .status').innerText = `Download cancelled.`;
+            $('#progress .bar .fill').classList.add('danger');
+            window.removeEventListener('beforeunload', warnOnUnload);
+            break;
+        }
+        case 'failed': {
+            $('#controls').dataset.state = 'hidden';
+            $('#progress .status').innerText = `Download failed. Please reload and try again.`;
+            $('#progress .bar .fill').classList.add('danger');
             window.removeEventListener('beforeunload', warnOnUnload);
             break;
         }
@@ -112,6 +132,9 @@ const startDirectDownload = async includeVideo => {
 
             // Loop through and download mapsets
             for (const mapset of beatmapsets) {
+                // Stop if cancelled
+                if ($('#cancel').disabled) break;
+
                 offset++;
 
                 // Get appropriate file name
@@ -164,16 +187,20 @@ const startDirectDownload = async includeVideo => {
                     }
                 }
             }
+
+            // Stop if cancelled
+            if ($('#cancel').disabled) break;
         }
 
-        // Mark complete
-        updateUI('direct_completed');
+        if ($('#cancel').disabled) {
+            updateUI('cancelled');
+        } else {
+            // Mark complete
+            updateUI('direct_completed');
+        }
     } catch (error) {
         console.error(error);
-        updateUI('log', {
-            message: `Fatal error encountered. Please reload and try again.`,
-            log_status: 'error'
-        });
+        updateUI('failed');
     }
 
     isDirectDownloadRunning = false;
@@ -181,6 +208,7 @@ const startDirectDownload = async includeVideo => {
 
 document.addEventListener('DOMContentLoaded', () => {
     const downloadInstance = getDownloadInstance();
+    const packId = downloadInstance.pack.id;
     const downloadId = downloadInstance.id;
 
     const isDirectSupported = 'showDirectoryPicker' in window;
@@ -227,6 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update controls state
     $('#controls').dataset.state = isDirectSupported ? 'initDirect' : 'initDirectUnsupported';
 
+    // Set up cancel button
+    $('#cancel').addEventListener('click', async () => {
+        $('#cancel').disabled = true;
+        await axios.post(`/packs/${packId}/download/${downloadId}/cancel`);
+    });
+
     // Connect to socket
     const socket = io('/');
 
@@ -257,5 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle completion
     socket.on('download_complete', data => {
         updateUI('zip_completed', data);
+    });
+
+    // Handle cancel
+    socket.on('download_cancel', data => {
+        updateUI('cancelled', data);
     });
 });

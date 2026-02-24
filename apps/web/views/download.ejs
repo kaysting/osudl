@@ -4,6 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>osu!dl Bulk Download - <%= download.pack.name %></title>
+        <link rel="icon" type="image/png" href="<%= asset('/assets/images/icon.png') %>" />
 
         <!-- CSS -->
         <link rel="stylesheet" href="<%= asset('/assets/css/utils.css') %>" />
@@ -38,6 +39,12 @@
             <div id="maps" class="flex-grow flex col gap-2"></div>
             <div id="controls" class="flex-no-shrink" data-state="hidden">
                 <div class="section">
+                    <div class="section cancel">
+                        <button id="cancel" class="btn">
+                            <span class="icon filled">close</span>
+                            <span class="label">Cancel download</span>
+                        </button>
+                    </div>
                     <div class="section folderSelect">
                         <button id="selectFolder" class="btn primary medium">
                             <span class="icon filled">folder</span>

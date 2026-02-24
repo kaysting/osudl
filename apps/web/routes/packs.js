@@ -66,6 +66,7 @@ router.get('/:packId/download/:downloadId', ensurePackExists, ensureDownloadExis
 });
 
 // Pack download as streamed zip
+const cancelledDownloadIds = new Set();
 router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownloadExists, async (req, res) => {
     // Get video setting
     const includeVideo = req.query.video === 'false' ? false : true;
@@ -95,6 +96,17 @@ router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownload
         zlib: { level: 0 }
     });
 
+    // Handle cancelling
+    res.on('close', () => {
+        if (res.writableEnded) return;
+        req.log(`Cancelled by client`);
+        io.to(socketRoomName).emit('download_cancel', {
+            count_maps_total: req.pack.map_count,
+            time_started: startTime
+        });
+        archive.abort();
+    });
+
     // Handle archiver errors
     archive.on('error', err => {
         utils.logErr('Zip stream error:', err);
@@ -117,8 +129,11 @@ router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownload
 
     // Loop through pack maps
     const mapsetIds = packsApi.getPackContentsRaw(req.pack.id);
-    console.log(mapsetIds.length);
     for (const mapsetId of mapsetIds) {
+        if (cancelledDownloadIds.has(req.downloadInstance.id)) {
+            req.log(`Finalizing zip early due to cancellation`);
+            break;
+        }
         try {
             // Get mapset data and build file name
             const mapset = mapsApi.getBeatmapset(mapsetId, false);
@@ -169,15 +184,29 @@ router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownload
     });
 
     res.on('finish', () => {
-        // Emit completion event
-        io.to(socketRoomName).emit('download_complete', {
-            count_maps_total: req.pack.map_count,
-            time_started: startTime
-        });
+        if (cancelledDownloadIds.has(req.downloadInstance.id)) {
+            // Emit cancelled event
+            io.to(socketRoomName).emit('download_cancel', {
+                count_maps_total: req.pack.map_count,
+                time_started: startTime
+            });
+        } else {
+            // Emit completion event
+            io.to(socketRoomName).emit('download_complete', {
+                count_maps_total: req.pack.map_count,
+                time_started: startTime
+            });
+        }
     });
 
     // Finalize archive
     await archive.finalize();
+});
+
+// Mark download as cancelled
+router.post('/:packId/download/:downloadId/cancel', ensurePackExists, ensureDownloadExists, async (req, res) => {
+    cancelledDownloadIds.add(req.downloadInstance.id);
+    res.json({ success: true });
 });
 
 // Redirect to the download for a specific map
