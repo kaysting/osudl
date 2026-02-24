@@ -109,18 +109,73 @@ const startDirectDownload = async includeVideo => {
         const packId = downloadInstance.pack.id;
         const downloadId = downloadInstance.id;
         let offset = 0;
+        let countDownloaded = 0;
 
         // Update UI
         updateUI('direct_starting');
 
         // Update progress
         const updateProgress = () => {
-            const i = offset - 1;
             updateUI('progress', {
-                percent: (i / downloadInstance.pack.map_count) * 100,
-                count_maps_downloaded: i,
+                percent: (countDownloaded / downloadInstance.pack.map_count) * 100,
+                count_maps_downloaded: countDownloaded,
                 count_maps_total: downloadInstance.pack.map_count
             });
+        };
+
+        // Function to actually download a mapset to the folder
+        const downloadMap = async mapset => {
+            // Get appropriate file name
+            const fileName = includeVideo ? mapset.suggested_file_name_video : mapset.suggested_file_name_novideo;
+
+            // Skip if the file exists
+            try {
+                await folderHandle.getFileHandle(fileName);
+                updateProgress();
+                updateUI('log', { message: fileName, log_status: 'skipped' });
+                countDownloaded++;
+                return;
+            } catch (error) {
+                // it doesn't exist
+            }
+
+            // Try to download the file until it succeeds
+            while (true) {
+                try {
+                    // Create file for writing
+                    const tempFileName = `${fileName}.part`;
+                    const fileHandle = await folderHandle.getFileHandle(tempFileName, { create: true });
+                    const writable = await fileHandle.createWritable();
+
+                    // Fetch and stream file
+                    const fileRes = await fetch(
+                        `/packs/${packId}/download/${downloadId}/beatmapset/${mapset.id}?video=${includeVideo}`
+                    );
+                    if (!fileRes.ok) throw new Error(`HTTP ${fileRes.status}`);
+
+                    // Pipe to file
+                    await fileRes.body.pipeTo(writable);
+
+                    // Move to final name
+                    fileHandle.move(fileName);
+
+                    // Update and break
+                    updateProgress();
+                    updateUI('log', {
+                        message: fileName
+                    });
+                    break;
+                } catch (error) {
+                    // Update progress, log, and wait to retry
+                    updateProgress();
+                    updateUI('log', {
+                        message: `Download failed, will try again: ${fileName}`,
+                        log_status: 'error'
+                    });
+                    await sleep(5000);
+                }
+            }
+            countDownloaded++;
         };
 
         // Loop until we exhaust the list of maps
@@ -129,64 +184,30 @@ const startDirectDownload = async includeVideo => {
             const res = await axios.get(`/packs/${packId}/beatmapsets?limit=100&offset=${offset}`);
             const beatmapsets = res.data.beatmapsets;
             if (!beatmapsets.length) break;
+            offset += beatmapsets.length;
 
-            // Loop through and download mapsets
-            for (const mapset of beatmapsets) {
-                // Stop if cancelled
-                if ($('#cancel').disabled) break;
+            // Create a queue from the fetched batch
+            const queue = [...beatmapsets];
+            const CONCURRENCY_LIMIT = 4;
 
-                offset++;
+            // Spin up 4 concurrent workers
+            const workers = Array(CONCURRENCY_LIMIT)
+                .fill(null)
+                .map(async () => {
+                    // Each worker loops until the queue is empty
+                    while (queue.length > 0) {
+                        if ($('#cancel').disabled) break;
 
-                // Get appropriate file name
-                const fileName = includeVideo ? mapset.suggested_file_name_video : mapset.suggested_file_name_novideo;
+                        // Grab the next mapset off the front of the array
+                        const mapset = queue.shift();
 
-                // Skip if the file exists
-                try {
-                    await folderHandle.getFileHandle(fileName);
-                    updateProgress();
-                    updateUI('log', { message: fileName, log_status: 'skipped' });
-                    continue;
-                } catch (error) {
-                    // it doesn't exist
-                }
-
-                // Try to download the file until it succeeds
-                while (true) {
-                    try {
-                        // Create file for writing
-                        const tempFileName = `${fileName}.part`;
-                        const fileHandle = await folderHandle.getFileHandle(tempFileName, { create: true });
-                        const writable = await fileHandle.createWritable();
-
-                        // Fetch and stream file
-                        const fileRes = await fetch(
-                            `/packs/${packId}/download/${downloadId}/beatmapset/${mapset.id}?video=${includeVideo}`
-                        );
-                        if (!fileRes.ok) throw new Error(`HTTP ${fileRes.status}`);
-
-                        // Pipe to file
-                        await fileRes.body.pipeTo(writable);
-
-                        // Move to final name
-                        fileHandle.move(fileName);
-
-                        // Update and break
-                        updateProgress();
-                        updateUI('log', {
-                            message: fileName
-                        });
-                        break;
-                    } catch (error) {
-                        // Update progress, log, and wait to retry
-                        updateProgress();
-                        updateUI('log', {
-                            message: `Download failed, will try again: ${fileName}`,
-                            log_status: 'error'
-                        });
-                        await sleep(5000);
+                        // Wait for this specific map to finish before the worker grabs another
+                        await downloadMap(mapset);
                     }
-                }
-            }
+                });
+
+            // Wait for all 4 workers to finish processing the chunk before fetching the next 50
+            await Promise.all(workers);
 
             // Stop if cancelled
             if ($('#cancel').disabled) break;
