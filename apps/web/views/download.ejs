@@ -51,15 +51,6 @@
                             <span class="label">Select destination folder...</span>
                         </button>
                     </div>
-                    <div class="section folderUnsupported">
-                        <div class="text">
-                            <strong>Your browser doesn't support downloading directly to a folder.</strong>
-                        </div>
-                        <div class="text">
-                            Switch to a Chromium-based desktop browser (Chrome, Edge, Opera, etc.), or download the maps
-                            as a zip file below.
-                        </div>
-                    </div>
                     <div class="section downloadToFolder">
                         <div class="text">
                             Start downloading maps to
@@ -78,23 +69,37 @@
                             </button>
                         </div>
                     </div>
-                    <div class="text danger folderSelectError"></div>
-                    <div
-                        class="text zipLink"
-                        title="Zip downloads are slow, unreliable, and expensive for us to provide. We highly recommend using the direct download to folder option if available.">
+                    <!-- prettier-ignore -->
+                    <%
+                        const basePath = `/packs/${download.pack.id}/download/${download.id}`;
+                        const isVideoTooBig = download.pack.size_video > env.MAX_ZIP_SIZE;
+                        const isNoVideoTooBig = download.pack.size_novideo > env.MAX_ZIP_SIZE;
+                        const tooBigTitle = `Exceeds maximum zip size of ${utils.formatSize(env.MAX_ZIP_SIZE)}`;
+                        const tooBigMessage = `Zip downloads are unavailable because they would exceed the maximum zip size of ${utils.formatSize(env.MAX_ZIP_SIZE)}. Refine your search query or use a Chromium-based desktop browser to download directly to a folder without size limits.`;
+                        const zipWarningTitle = `Zip downloads are slow, unreliable, and expensive for us to provide. We highly recommend using the direct download to folder option if possible.`;
+                    %>
+                    <div class="text zipLink" title="<%= zipWarningTitle %>">
                         Not working?
                         <a id="showZipLinks">Download as zip</a>
                         instead (not recommended)
                     </div>
+                    <div class="section folderUnsupported">
+                        <div class="text">
+                            <strong>Your browser doesn't support downloading directly to a folder.</strong>
+                        </div>
+                        <div class="text">
+                            Consider switching to a Chromium-based desktop browser (Chrome, Edge, Opera, etc.) to use
+                            this functionality.
+                        </div>
+                    </div>
+                    <div class="text danger folderSelectError"></div>
                     <div class="section zip">
-                        <!-- prettier-ignore -->
-                        <%
-                            const basePath = `/packs/${download.pack.id}/download/${download.id}`;
-                            const isVideoTooBig = download.pack.size_video > env.MAX_ZIP_SIZE;
-                            const isNoVideoTooBig = download.pack.size_novideo > env.MAX_ZIP_SIZE;
-                            const tooBigTitle = `Exceeds maximum zip size of ${utils.formatSize(env.MAX_ZIP_SIZE)}`;
-                        %>
-                        <div class="text zipLabel">Download maps as zip (not recommended):</div>
+                        <% if (isVideoTooBig && isNoVideoTooBig) { %>
+                        <div class="text"><%= tooBigMessage %></div>
+                        <% } else { %>
+                        <div class="text zipLabel" title="<%= zipWarningTitle %>">
+                            Download maps as zip (not recommended):
+                        </div>
                         <div class="split">
                             <a
                                 href="<%= isVideoTooBig ? '' : `${basePath}/zip?video=true` %>"
@@ -113,6 +118,7 @@
                                 </div>
                             </a>
                         </div>
+                        <% } %>
                     </div>
                 </div>
             </div>
