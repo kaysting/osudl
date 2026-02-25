@@ -6,3 +6,5 @@ node_modules
 .*
 !.prettierrc
 !.gitignore
+
+/apps/web/public/desktop

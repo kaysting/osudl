@@ -1,0 +1,1 @@
+conveyor make site --output-dir=../web/public/desktop
