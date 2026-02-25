@@ -743,19 +743,18 @@ img {
 .popup {
     --width: 600px;
     --height: 800px;
-    margin: auto;
     display: flex;
+    margin: auto;
     border: none;
     background: var(--c-base-15);
     border-radius: 16px;
-    box-shadow: 0px 8px 16px var(--shadow-lg);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5);
     flex-direction: column;
     color: inherit;
     font-size: inherit;
     font-family: inherit;
     max-width: min(var(--width), calc(100% - 16px));
     max-height: min(var(--height), calc(100% - 16px));
-    gap: 16px;
     transform: scale(0.95);
     opacity: 0;
     transition: 0.2s ease-in-out;
@@ -772,7 +771,7 @@ img {
 
 .popup>.title {
     padding: 16px;
-    padding-bottom: 0px;
+    margin: 0px;
     font-size: 24px;
     text-align: center;
     font-weight: bold;
@@ -783,7 +782,7 @@ img {
 }
 
 .popup>.body {
-    padding: 4px 16px;
+    padding: 8px 16px;
     font-size: 16px;
     line-height: 1.5;
     overflow-y: auto;
@@ -793,7 +792,6 @@ img {
 
 .popup>.actions {
     padding: 16px;
-    padding-top: 0px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 8px;
@@ -1041,7 +1039,7 @@ img {
     padding: 4px;
 }
 
-@media (max-width: 450px) {
+@media (max-width: 350px) {
     .beatmapsetCard .left {
         display: none;
     }
@@ -1127,4 +1125,9 @@ img {
     top: var(--arrow-y, 50%);
     transform: translateY(-50%);
     border-right-color: var(--tooltip-bg);
+}
+
+.htmx-request {
+    opacity: 0.5;
+    transition: 0.1s ease-in-out;
 }

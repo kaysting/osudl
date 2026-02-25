@@ -1,11 +1,11 @@
 <div
-    id="results"
     class="card flex col gap-8"
     hx-replace-url="true"
     hx-swap="outerHTML"
     hx-select="#results"
     hx-target="#results"
-    hx-select-oob="#downloadAll">
+    hx-select-oob="#downloadAllCont, #status"
+    hx-indicator="#results, #downloadAllCont .btn">
     <!-- Hidden inputs for sort and page -->
     <input type="hidden" name="s" value="<%= search.sort %>" />
     <input type="hidden" name="p" value="<%= search.page %>" />
@@ -19,7 +19,7 @@
                 name="q"
                 id="inputQuery"
                 class="input"
-                placeholder="Search and filter here..."
+                placeholder="Type filters or search terms..."
                 value="<%= search.query %>"
                 autocapitalize="none"
                 autocomplete="off"
@@ -31,23 +31,25 @@
                 hx-vals='{"p": 1}' />
         </div>
         <div class="flex gap-8 align-center">
-            <button id="filterHelp" class="btn small text accent" id="filterHelpButton">
+            <button class="btn small text accent" onClick="showFilterHelpPopup()">
                 <span class="icon">filter_alt</span>
                 <span class="label">Filter help</span>
             </button>
-            <div class="status" data-reload-socket-event="update_stats,new_mapset">
+            <div id="status" class="status" data-reload-socket-event="update_stats,new_mapset">
                 Found <%= results.count.total_beatmapsets.toLocaleString() %> beatmapsets
             </div>
         </div>
     </div>
 
     <!-- Inner container -->
-    <div class="card lighter flex col gap-8">
+    <div id="results" class="card lighter flex col gap-8">
         <!-- Results navigation with sort and pagination buttons -->
-        <div id="resultsNav" class="flex gap-8 flex-wrap">
-            <div id="mapSort" class="flex flex-grow flex-wrap">
-                <!-- prettier-ignore -->
-                <% const sortOptions = [
+        <div id="resultsNav" class="flex gap-8 flex-wrap align-end">
+            <div class="section" id="mapSort">
+                <div class="icon flex-no-shrink">sort</div>
+                <div class="flex flex-wrap gap-4">
+                    <!-- prettier-ignore -->
+                    <% const sortOptions = [
                     {
                         key: 'auto',
                         label: 'Auto',
@@ -76,23 +78,24 @@
                     },
                 ]; %>
                 <% for (const option of sortOptions) { %>
-                <a
-                    hx-get="?"
-                    hx-include="[name='q']"
-                    hx-vals='{"s": "<%= option.key %>", "p": 1}'
-                    class="btn <%= option.selected ? 'primary' : '' %>">
-                    <span class="label"><%= option.label %></span>
-                    <% if (option.selected && option.key != 'auto') { %>
-                    <span class="icon">
-                        <%= option.key.endsWith('asc') ? 'keyboard_arrow_down' : 'keyboard_arrow_up' %>
-                    </span>
+                    <a
+                        hx-get="?"
+                        hx-include="[name='q']"
+                        hx-vals='{"s": "<%= option.key %>", "p": 1}'
+                        class="btn small <%= option.selected ? 'primary' : 'text accent' %>">
+                        <span class="label"><%= option.label %></span>
+                        <% if (option.selected && option.key != 'auto') { %>
+                        <span class="icon">
+                            <%= option.key.endsWith('asc') ? 'keyboard_arrow_down' : 'keyboard_arrow_up' %>
+                        </span>
+                        <% } %>
+                    </a>
                     <% } %>
-                </a>
-                <% } %>
+                </div>
             </div>
 
             <!-- Pagination -->
-            <div class="btnGroup">
+            <div class="btnGroup flex-grow justify-end">
                 <button
                     title="Previous page"
                     hx-get="?"
@@ -113,12 +116,19 @@
         </div>
 
         <!-- The actual results -->
+        <% if (results.beatmapsets.length) { %>
         <div class="beatmapsetCardContainer">
             <!-- prettier-ignore -->
             <% for (const beatmapset of results.beatmapsets) { %>
-            <%- include('../partials/components/beatmapsetCard', { beatmapset }) %>
-        <% } %>
+                <%- include('../partials/components/beatmapsetCard', { beatmapset }) %>
+            <% } %>
         </div>
+        <% } else { %>
+        <div id="noResults" class="flex col gap-8">
+            <div class="icon">sentiment_sad</div>
+            <div class="text">Your search found no beatmaps.</div>
+        </div>
+        <% } %>
 
         <!-- Pagination -->
         <div class="btnGroup justify-end flex-grow">
@@ -143,14 +153,12 @@
 </div>
 
 <div id="downloadAllCont" class="p-sticky bottom-0 flex justify-center">
-    <button
-        id="downloadAll"
-        class="btn primary large"
-        data-query="<%= search.query %>"
-        onClick="downloadAllResults(this)">
+    <% if (results.beatmapsets.length) { %>
+    <button class="btn primary large" data-query="<%= search.query %>" onClick="downloadAllResults(this)">
         <span class="icon">download</span>
         <span class="label">Download all results</span>
     </button>
+    <% } %>
 </div>
 
 <style>
@@ -169,13 +177,46 @@
         color: var(--c-base-70);
     }
 
-    #mapSort {
-        gap: 8px 4px;
+    #resultsNav > .section {
+        display: flex;
+        padding: 4px;
+        gap: 8px;
+        align-items: center;
+        padding-left: 8px;
+        background: var(--c-base-25);
+        border-radius: 8px;
     }
 
-    #mapSort .icon {
+    #resultsNav .btn.text {
+        --btnBgHover: var(--c-base-35);
+    }
+
+    #resultsNav > .section > .icon {
+        font-family: 'Material Symbols Rounded';
+        color: var(--c-base-80);
+        font-size: 24px;
+        user-select: none;
+        flex-shrink: 0;
+    }
+
+    #mapSort .btn .icon {
         margin: 0px -4px;
         margin-top: 1px;
+        font-size: 20px;
+    }
+
+    #noResults {
+        font-size: 20px;
+        color: var(--c-base-70);
+        text-align: center;
+        padding: 24px 8px;
+    }
+
+    #noResults .icon {
+        font-family: 'Material Symbols Rounded';
+        font-size: 64px;
+        user-select: none;
+        flex-shrink: 0;
     }
 
     #downloadAllCont {

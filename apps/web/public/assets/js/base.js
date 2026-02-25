@@ -91,6 +91,15 @@ const showPopup = (title, body, actions = [], options = {}) => {
     // Show dialog
     document.body.appendChild(dialog);
     dialog.showModal();
+
+    // Process HTMX
+    try {
+        htmx.process(dialog);
+    } catch (error) {
+        // htmx not supported, it's fine
+    }
+
+    // Handle dialog toggle
     dialog.addEventListener('toggle', async e => {
         if (!dialog.open) return; // return if closed
         if (onBeforeShow) {

@@ -80,3 +80,15 @@ const downloadAllResults = async btn => {
     // Redirect popup
     popup.location.href = `/packs/${res.data.pack.id}/download`;
 };
+
+const showFilterHelpPopup = () => {
+    showPopup(
+        `Search and filtering help`,
+        `<div hx-get="/api/partials/search-filter-help" hx-trigger="load" hx-swap="outerHTML"</div>`,
+        [{ label: 'Close', class: 'primary' }],
+        {
+            width: 800,
+            height: 800
+        }
+    );
+};

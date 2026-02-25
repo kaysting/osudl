@@ -1,11 +1,14 @@
 const env = require('#env');
 const path = require('path');
+const fs = require('fs');
 const express = require('express');
+const ejs = require('ejs');
 const db = require('#db');
 const utils = require('#utils');
 
 // Start server
 const { app, io } = require('./server');
+const { marked } = require('marked');
 
 // Handle socket connections
 io.on('connection', socket => {
@@ -73,6 +76,9 @@ app.locals.asset = (pathRel, returnAbsolute = false) => {
         return `${baseUrl}/${pathRel}`;
     }
 };
+app.locals.includeMarkdown = mdPath => {
+    return marked.parse(fs.readFileSync(path.join(env.ROOT, 'apps/web/views/markdown', mdPath), 'utf8'));
+};
 
 // Set up rendering
 app.set('view engine', 'ejs');
@@ -91,6 +97,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Register routes
 app.use('/api/json', require('./routes/apiJson'));
+app.use('/api/partials', require('./routes/apiHtml'));
 app.use('/', require('./routes/direct'));
 app.use('/', require('./routes/home'));
 app.use('/', require('./routes/redirects'));
