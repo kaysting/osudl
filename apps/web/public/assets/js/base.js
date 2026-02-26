@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('click', e => {
     const interactiveChild = e.target.closest('button, a, input');
     const el = e.target.closest('[data-on-click]');
-    if (el?.contains(interactiveChild)) return;
+    if (interactiveChild !== el && el?.contains(interactiveChild)) return;
     if (el) {
         const action = el.dataset.onClick;
         eval(action);
