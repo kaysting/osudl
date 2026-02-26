@@ -6,6 +6,7 @@
         </div>
         <div class="slogan">Search, filter, and bulk download osu! maps!</div>
     </div>
+
     <form
         class="search flex gap-8 align-center"
         hx-get="/beatmapsets"
@@ -32,9 +33,18 @@
         </div>
         <button type="submit" class="btn primary large">
             <span class="icon">search</span>
-            <span class="label">Start searching</span>
+            <span class="label">Search!</span>
         </button>
     </form>
+
+    <div class="stats flex row gap-16 align-center justify-center flex-wrap">
+        <% for (const stat of stats) { %>
+        <div class="card stat flex col gap-8">
+            <div class="value"><%= stat.value_formatted || stat.value %></div>
+            <div class="name"><%= stat.name %></div>
+        </div>
+        <% } %>
+    </div>
 </div>
 
 <style>
@@ -54,13 +64,30 @@
     #home .top .slogan {
         font-size: 24px;
         color: var(--c-base-60);
+        line-height: 1.1;
     }
 
-    @media (max-width: 650px) {
-        #home .search {
+    #home .stats .stat {
+        padding: 16px 20px;
+        padding-bottom: 18px;
+    }
+    #home .stats .stat .value {
+        font-size: 36px;
+        color: var(--c-accent-75);
+    }
+    #home .stats .stat .name {
+        font-size: 18px;
+        color: white;
+        font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+        #home .search,
+        #home .stats {
             flex-direction: column;
             justify-content: unset;
             align-items: unset;
+            width: 100%;
         }
     }
 </style>
