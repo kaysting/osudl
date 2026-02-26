@@ -1,0 +1,141 @@
+<div class="beatmapsetDetails flex col gap-16">
+    <div class="top p-relative overflow-hidden rounded-16">
+        <img
+            class="cover p-absolute w-full h-full object-cover top-0 left-0"
+            src="https://assets.ppy.sh/beatmaps/<%= beatmapset.id %>/covers/cover.jpg"
+            onError="this.onerror=null; this.src='/assets/images/beatmap-cover-fallback.png';"
+            loading="lazy" />
+        <div class="dimming p-absolute w-full h-full top-0 left-0"></div>
+        <div class="content flex col gap-16">
+            <div class="text">
+                <div class="artist"><%= beatmapset.artist %></div>
+                <div class="title"><%= beatmapset.title %></div>
+            </div>
+            <div class="text details">
+                <div class="mapper">Mapped by <%= beatmapset.mapper %></div>
+                <div class="submitted">Submitted on <%= dayjs(beatmapset.time_submitted).format('YYYY-MM-DD') %></div>
+                <div class="ranked">Ranked on <%= dayjs(beatmapset.time_ranked).format('YYYY-MM-DD') %></div>
+            </div>
+            <div class="buttons flex gap-8 flex-wrap align-end">
+                <div class="flex gap-8 flex-wrap flex-grow">
+                    <% if (beatmapset.has_video) { %>
+                    <a href="/s/<%= beatmapset.id %>?video=true" class="btn large primary">
+                        <span class="icon">download</span>
+                        <span class="label">
+                            <span>Download</span>
+                            <span class="small">With video</span>
+                        </span>
+                    </a>
+                    <a href="/s/<%= beatmapset.id %>?video=false" class="btn large primary">
+                        <span class="icon">download</span>
+                        <span class="label">
+                            <span>Download</span>
+                            <span class="small">Without video</span>
+                        </span>
+                    </a>
+                    <% } else { %>
+                    <a href="/s/<%= beatmapset.id %>" class="btn large primary">
+                        <span class="icon">download</span>
+                        <span class="label">Download</span>
+                    </a>
+                    <% } %>
+                    <a href="osu://s/<%= beatmapset.id %>" class="btn large primary">
+                        <span class="icon">rocket_launch</span>
+                        <span class="label">osu!direct</span>
+                    </a>
+                </div>
+                <a
+                    href="https://osu.ppy.sh/beatmapsets/<%= beatmapset.id %>"
+                    class="btn medium square"
+                    title="View on osu! website">
+                    <span class="icon">open_in_new</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- prettier-ignore -->
+    <%
+        const mapsByMode = {};
+        for (const map of beatmapset.beatmaps) {
+            if (!mapsByMode[map.mode_name]) mapsByMode[map.mode_name] = [];
+            mapsByMode[map.mode_name].push(map);
+        }
+    %>
+
+    <% for (const mode in mapsByMode) { %>
+    <div>
+        <div class="header"><%= utils.osuModeToName(mode, true) %></div>
+    </div>
+    <div class="maps flex col gap-4">
+        <% for (const map of mapsByMode[mode]) { %>
+        <button
+            class="map btn dynamic flex gap-8"
+            style="
+                --color-bg: <%= map.difficulty_color.bg %>;
+                --color-fg: <%= map.difficulty_color.fg %>;
+                --color-text: <%= map.stars > 6.5 ? map.difficulty_color.fg: map.difficulty_color.bg %>;
+            "
+            onClick="this.classList.toggle('expanded')">
+            <div class="flex-no-shrink">
+                <img src="/assets/images/ruleset-icons/<%= map.mode_name %>.svg" class="ruleset" />
+            </div>
+            <div class="content flex col gap-8 flex-grow">
+                <div class="flex gap-8">
+                    <div class="beatmapStars p-relative rounded-16 flex-no-shrink">
+                        <div class="icon">star</div>
+                        <span><%= map.stars.toFixed(2) %></span>
+                    </div>
+                    <div class="version"><%= map.version %></div>
+                </div>
+                <div class="details flex flex-wrap justify-evenly" style="gap: 4px 32px">
+                    <div class="iconStats flex flex-wrap">
+                        <div class="stat" title="Total length">
+                            <div class="icon">schedule</div>
+                            <div class="value"><%= map.total_length %></div>
+                        </div>
+                        <div class="stat" title="BPM">
+                            <div class="icon">speed</div>
+                            <div class="value"><%= utils.formatNumber(map.bpm) %></div>
+                        </div>
+                    </div>
+                    <div class="iconStats flex flex-wrap">
+                        <div class="stat" title="Circle count">
+                            <div class="icon">radio_button_checked</div>
+                            <div class="value"><%= utils.formatNumber(map.count_circles) %></div>
+                        </div>
+                        <div class="stat" title="Slider count">
+                            <div class="icon">linear_scale</div>
+                            <div class="value"><%= utils.formatNumber(map.count_sliders) %></div>
+                        </div>
+                        <div class="stat" title="Spinner count">
+                            <div class="icon">cyclone</div>
+                            <div class="value"><%= utils.formatNumber(map.count_spinners) %></div>
+                        </div>
+                    </div>
+                    <div class="iconStats flex flex-wrap">
+                        <div class="stat" title="Circle size">
+                            <div class="label">CS</div>
+                            <div class="value"><%= map.cs %></div>
+                        </div>
+                        <div class="stat" title="Approach rate">
+                            <div class="label">AR</div>
+                            <div class="value"><%= map.ar %></div>
+                        </div>
+                        <div class="stat" title="Overall difficulty">
+                            <div class="label">OD</div>
+                            <div class="value"><%= map.od %></div>
+                        </div>
+                        <div class="stat" title="HP drain">
+                            <div class="label">HP</div>
+                            <div class="value"><%= map.hp %></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="icon"></div>
+        </button>
+        <% } %>
+    </div>
+    <% } %>
+</div>

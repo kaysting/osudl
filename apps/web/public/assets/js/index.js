@@ -99,3 +99,7 @@ const showFilterHelpPopup = () => {
 const showCopyrightPopup = () => {
     showRenderedPopup(`Report copyright`, '/api/partials/markdown/report-copyright', 600, 'Okay');
 };
+
+const showMapsetDetailsPopup = mapsetId => {
+    showRenderedPopup(`Beatmap details`, `/api/partials/beatmapsets/${mapsetId}/details`, 800);
+};

@@ -94,7 +94,7 @@
                 <%
                 const sidebarItems = [
                     { page: 'home', path: '/', icon: 'home', label: 'Home' },
-                    { page: 'mapSearch', path: '/beatmapsets', icon: 'search', label: 'Search and filter maps' },
+                    { page: 'search', path: '/beatmapsets', icon: 'search', label: 'Search and filter maps' },
 
                     { page: 'sep' },
 
@@ -144,8 +144,8 @@
                         hx-select="#content"
                         hx-target="#content"
                         hx-swap="outerHTML"
-                        hx-select-oob="#sidebar-scroll"
-                        hx-indicator="#content"
+                        hx-select-oob="#sidebar"
+                        hx-indicator="#content, #sidebar-scroll"
                         class="btn item page <%= page == (item.page || '') ? 'active' : '' %>">
                         <span class="icon"><%= item.icon %></span>
                         <span class="label"><%= item.label %></span>

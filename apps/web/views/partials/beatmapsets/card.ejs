@@ -1,4 +1,9 @@
-<div class="beatmapsetCard rounded-16 overflow-hidden flex">
+<div
+    class="p-relative beatmapsetCard rounded-16 overflow-hidden flex"
+    role="button"
+    tabindex="0"
+    data-on-click="showMapsetDetailsPopup(<%= beatmapset.id %>)"
+    onKeyDown="simulateButtonKeypress()">
     <div class="left p-relative flex-no-shrink flex align-center justify-center">
         <img
             class="listImage p-absolute w-full h-full object-cover"

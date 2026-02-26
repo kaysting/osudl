@@ -316,6 +316,13 @@ const initSvgIconMasks = () => {
     });
 };
 
+const simulateButtonKeypress = event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        event.target.click();
+    }
+};
+
 // Update dynamic timestamp elements
 const updateTimestampElements = () => {
     const els = [...document.querySelectorAll('[data-timestamp]')];
@@ -362,7 +369,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('click', e => {
-    const el = e.target.closest('button, a');
+    const interactiveChild = e.target.closest('button, a, input');
+    const el = e.target.closest('[data-on-click]');
+    if (el?.contains(interactiveChild)) return;
     if (el) {
         const action = el.dataset.onClick;
         eval(action);

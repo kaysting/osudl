@@ -354,3 +354,126 @@ img.loaded {
     font-size: 16px;
     color: var(--c-base-65);
 }
+
+.beatmapsetDetails {
+    max-width: 100%;
+    width: 800px;
+}
+
+.beatmapsetDetails .top .dimming {
+    background: var(--c-base-30-70);
+}
+
+.beatmapsetDetails .top .content {
+    padding: 24px 16px;
+    position: relative;
+    line-height: 1.2;
+    color: white;
+}
+
+.beatmapsetDetails .top .content .text {
+    filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.beatmapsetDetails .top .artist {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.beatmapsetDetails .top .title {
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.beatmapsetDetails .top .details {
+    font-size: 16px;
+    color: var(--c-base-90);
+    font-weight: 600;
+}
+
+.beatmapsetDetails .top .details {
+    font-size: 16px;
+    color: var(--c-base-90);
+    font-weight: 600;
+}
+
+.beatmapsetDetails .maps .map {
+    --btnBg: transparent;
+    --btnBgHover: var(--c-base-25);
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 4px 8px;
+}
+
+.beatmapsetDetails .maps .map.expanded {
+    --btnBg: var(--c-base-25);
+    --btnBgHover: var(--c-base-30);
+}
+
+.beatmapsetDetails .maps .map>.icon {
+    margin-top: 4px;
+}
+
+.beatmapsetDetails .maps .map>.icon::after {
+    content: 'keyboard_arrow_down'
+}
+
+.beatmapsetDetails .maps .map.expanded>.icon::after {
+    content: 'keyboard_arrow_up'
+}
+
+.beatmapsetDetails .maps .map .ruleset {
+    width: 24px;
+    border-radius: 50%;
+    background: var(--color-bg);
+}
+
+.beatmapsetDetails .maps .map .beatmapStars {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    margin-top: 1px;
+}
+
+.beatmapsetDetails .maps .map .content {
+    margin-top: 3px;
+}
+
+.beatmapsetDetails .maps .map .version {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--color-text);
+}
+
+.beatmapsetDetails .maps .map:not(.expanded) .details {
+    display: none;
+}
+
+.beatmapsetDetails .maps .map .details .iconStats {
+    gap: 4px 16px;
+}
+
+.beatmapsetDetails .maps .map .details .iconStats .stat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 24px;
+}
+
+.beatmapsetDetails .maps .map .details .iconStats .stat .icon {
+    color: var(--color-text);
+    font-size: 24px;
+}
+
+.beatmapsetDetails .maps .map .details .iconStats .stat .label {
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.beatmapsetDetails .maps .map .details .iconStats .stat .value {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+}

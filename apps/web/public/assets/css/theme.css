@@ -504,11 +504,6 @@ img {
     display: none;
 }
 
-.btn.dynamic {
-    height: auto;
-    padding: 4px 12px;
-}
-
 .btn.small {
     height: 26px;
     font-size: 14px;
@@ -555,6 +550,12 @@ img {
     padding: 0px;
 }
 
+.btn.dynamic {
+    height: auto;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
 .btn .icon {
     --size: 20px;
     font-family: 'Material Symbols Rounded';
@@ -597,7 +598,7 @@ img {
 }
 
 .btn .label .small {
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .btn .icon.filled {
@@ -899,6 +900,7 @@ img {
     font-weight: 600;
     font-size: 13px;
     color: black;
+    border-radius: 16px;
 }
 
 .beatmapStatus {
@@ -938,6 +940,15 @@ img {
 .beatmapsetCard {
     background: var(--c-base-12);
     user-select: none;
+    transition: 0.1s ease-in-out;
+}
+
+.beatmapsetCard:hover,
+.beatmapsetCard:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--c-accent-65);
+    cursor: pointer;
+    transition: none;
 }
 
 .beatmapsetCard .left {
@@ -1130,4 +1141,5 @@ img {
 .htmx-request {
     opacity: 0.5;
     transition: 0.1s ease-in-out;
+    pointer-events: none;
 }

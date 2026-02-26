@@ -2,7 +2,7 @@ const env = require('#env');
 const path = require('path');
 const fs = require('fs');
 const express = require('express');
-const ejs = require('ejs');
+const dayjs = require('dayjs');
 const db = require('#db');
 const utils = require('#utils');
 
@@ -64,6 +64,7 @@ app.use((req, res, next) => {
 // Pass stuff into EJS
 app.locals.env = env;
 app.locals.utils = utils;
+app.locals.dayjs = dayjs;
 app.locals.asset = (pathRel, returnAbsolute = false) => {
     pathRel = pathRel.replace(/^\/+/g, ''); // remove leading slash for append
     const filePath = path.join(__dirname, 'public', pathRel);
