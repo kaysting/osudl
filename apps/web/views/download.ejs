@@ -38,6 +38,15 @@
             </div>
             <div id="maps" class="flex-grow flex col gap-2"></div>
             <div id="controls" class="flex-no-shrink" data-state="hidden">
+                <!-- prettier-ignore -->
+                <%
+                    const basePath = `/packs/${download.pack.id}/download/${download.id}`;
+                    const isVideoTooBig = download.pack.size_video > env.MAX_ZIP_SIZE;
+                    const isNoVideoTooBig = download.pack.size_novideo > env.MAX_ZIP_SIZE;
+                    const tooBigTitle = `Exceeds maximum zip size of ${utils.formatSize(env.MAX_ZIP_SIZE)}`;
+                    const tooBigMessage = `Zip downloads are unavailable because they would exceed the maximum zip size of ${utils.formatSize(env.MAX_ZIP_SIZE)}. Refine your search query or use osu!dl Desktop or a Chromium-based desktop browser to download directly to a folder without size limits.`;
+                    const zipWarningTitle = `Zip downloads are slow, unreliable, and are only available for downloads under ${utils.formatSize(env.MAX_ZIP_SIZE)}.`;
+                %>
                 <div class="section">
                     <div class="section cancel">
                         <button id="cancel" class="btn">
@@ -69,28 +78,25 @@
                             </button>
                         </div>
                     </div>
-                    <!-- prettier-ignore -->
-                    <%
-                        const basePath = `/packs/${download.pack.id}/download/${download.id}`;
-                        const isVideoTooBig = download.pack.size_video > env.MAX_ZIP_SIZE;
-                        const isNoVideoTooBig = download.pack.size_novideo > env.MAX_ZIP_SIZE;
-                        const tooBigTitle = `Exceeds maximum zip size of ${utils.formatSize(env.MAX_ZIP_SIZE)}`;
-                        const tooBigMessage = `Zip downloads are unavailable because they would exceed the maximum zip size of ${utils.formatSize(env.MAX_ZIP_SIZE)}. Refine your search query or use a Chromium-based desktop browser to download directly to a folder without size limits.`;
-                        const zipWarningTitle = `Zip downloads are slow, unreliable, and expensive for us to provide. We highly recommend using the direct download to folder option if possible.`;
-                    %>
-                    <div class="text zipLink" title="<%= zipWarningTitle %>">
-                        Not working?
-                        <a id="showZipLinks">Download as zip</a>
-                        instead (not recommended)
-                    </div>
                     <div class="section folderUnsupported">
                         <div class="text">
                             <strong>Your browser doesn't support downloading directly to a folder.</strong>
                         </div>
                         <div class="text">
-                            Please consider using a Chromium-based desktop browser (Chrome, Edge, Opera, etc.) to take
-                            advantage of this functionality.
+                            Download the osu!dl desktop app or use Chromium-based desktop browser (Chrome, Edge, Opera,
+                            etc.) to take advantage of this functionality.
                         </div>
+                    </div>
+                    <div class="section downloadDesktop">
+                        <a href="/desktop/download.html" target="_blank" class="btn primary medium">
+                            <span class="icon filled">widgets</span>
+                            <span class="label">Download osu!dl Desktop...</span>
+                        </a>
+                    </div>
+                    <div class="text zipLink" title="<%= zipWarningTitle %>">
+                        Not working?
+                        <a id="showZipLinks">Download as zip</a>
+                        instead (not recommended)
                     </div>
                     <div class="text danger folderSelectError"></div>
                     <div class="section zip">

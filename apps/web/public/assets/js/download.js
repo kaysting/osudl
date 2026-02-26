@@ -257,13 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Handle force-showing zip options
-        $('#controls .text.zipLink a').addEventListener('click', () => {
-            $('#controls .text.folderSelectError').style.display = '';
-            $('#controls .text.zipLink').style.display = '';
-            $('#controls').dataset.state = 'initForceZip';
-        });
-
         // Add listeners to start buttons
         for (const btn of $$('#controls .section.downloadToFolder button')) {
             btn.addEventListener('click', async () => {
@@ -272,6 +265,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+
+    // Handle force-showing zip options
+    $('#controls .text.zipLink a').addEventListener('click', () => {
+        $('#controls .text.folderSelectError').style.display = '';
+        $('#controls .text.zipLink').style.display = '';
+        $('#controls').dataset.state = 'initForceZip';
+    });
 
     // Update controls state
     $('#controls').dataset.state = isDirectSupported ? 'initDirect' : 'initDirectUnsupported';

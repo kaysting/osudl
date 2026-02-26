@@ -139,6 +139,7 @@ main {
 #controls .section.folderSelect,
 #controls .section.zip,
 #controls .section.cancel,
+#controls .section.downloadDesktop,
 #controls .text.folderSelectError,
 #controls .text.zipLink,
 #controls[data-state="hidden"] {
@@ -147,10 +148,15 @@ main {
 
 #controls[data-state="initDirect"] .section.folderSelect,
 #controls[data-state="initDirectUnsupported"] .section.folderUnsupported,
-#controls[data-state="initDirectUnsupported"] .section.zip,
+#controls[data-state="initDirectUnsupported"] .section.downloadDesktop,
+#controls[data-state="initForceZip"] .section.downloadDesktop,
 #controls[data-state="initForceZip"] .section.zip,
 #controls[data-state="folderSelected"] .section.folderSelect,
 #controls[data-state="folderSelected"] .section.downloadToFolder,
 #controls[data-state="cancel"] .section.cancel {
     display: flex;
+}
+
+#controls[data-state="initDirectUnsupported"] .text.zipLink {
+    display: block;
 }
