@@ -42,8 +42,6 @@ env.S3_REGION = process.env.S3_REGION || 'auto';
  * Needs to be true for some S3 servers.
  */
 env.S3_FORCE_PATH_STYLE = process.env.S3_FORCE_PATH_STYLE === 'true';
-/** The base URL used for serving S3 public object links */
-env.S3_PUBLIC_BASE_URL = process.env.S3_PUBLIC_BASE_URL;
 
 /** Webserver part */
 env.PORT = process.env.PORT || 8080;
