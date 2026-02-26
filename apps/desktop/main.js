@@ -20,7 +20,7 @@ app.whenReady().then(() => {
         };
     });
 
-    win.loadURL('https://new.osudl.org');
+    win.loadURL('https://osudl.org');
 });
 
 app.on('window-all-closed', () => {
