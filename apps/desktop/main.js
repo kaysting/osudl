@@ -2,15 +2,25 @@ const { app, BrowserWindow } = require('electron');
 
 app.whenReady().then(() => {
     const win = new BrowserWindow({
-        width: 1200,
-        height: 800,
-        autoHideMenuBar: true, // Hides the default Windows/Linux file menus
+        width: 1350,
+        height: 900,
+        autoHideMenuBar: true,
         webPreferences: {
-            experimentalFeatures: true // Crucial for file system APIs
+            experimentalFeatures: true
         }
     });
 
-    win.loadURL('https://new.osudl.org'); // Change to your live URL
+    // Override some defaults for popups opened with window.open
+    win.webContents.setWindowOpenHandler(() => {
+        return {
+            action: 'allow',
+            overrideBrowserWindowOptions: {
+                autoHideMenuBar: true
+            }
+        };
+    });
+
+    win.loadURL('https://new.osudl.org');
 });
 
 app.on('window-all-closed', () => {

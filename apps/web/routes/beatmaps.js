@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
     const limit = 120;
     const offset = (page - 1) * limit;
     const results = mapsApi.searchBeatmaps(query, sort, limit, offset);
-    res.renderPage('mapSearch', {
+    res.renderPage('search', {
         title: query ? `Maps matching ${query}` : 'Search and filter maps',
         topbar: {
             icon: 'search',

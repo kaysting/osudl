@@ -81,14 +81,21 @@ const downloadAllResults = async btn => {
     popup.location.href = `/packs/${res.data.pack.id}/download`;
 };
 
-const showFilterHelpPopup = () => {
+const showRenderedPopup = (title, path, width = 600, buttonLabel = 'Close') => {
     showPopup(
-        `Search and filtering help`,
-        `<div hx-get="/api/partials/search-filter-help" hx-trigger="load" hx-swap="outerHTML"</div>`,
-        [{ label: 'Close', class: 'primary' }],
+        title,
+        `<div hx-get="${path}" hx-trigger="load" hx-swap="outerHTML"</div>`,
+        [{ label: buttonLabel, class: 'primary' }],
         {
-            width: 800,
-            height: 800
+            width
         }
     );
+};
+
+const showFilterHelpPopup = () => {
+    showRenderedPopup(`Search and filtering help`, '/api/partials/markdown/filter-help', 800);
+};
+
+const showCopyrightPopup = () => {
+    showRenderedPopup(`Report copyright`, '/api/partials/markdown/report-copyright', 600, 'Okay');
 };

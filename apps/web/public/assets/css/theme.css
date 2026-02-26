@@ -371,7 +371,7 @@ ol:not(:last-child):not(li > ol) {
 }
 
 a {
-    color: var(--c-accent-60);
+    color: var(--c-accent-70);
     text-decoration: none;
 }
 

@@ -105,6 +105,10 @@
                     { path: '/github', target: '_blank', icon: 'code', label: 'Source code' },
                     { path: '/kofi', target: '_blank', icon: 'favorite', label: 'Donate on Ko-fi' },
                     { path: 'https://osucomplete.org', target: '_blank', icon: 'check_circle', label: 'Also try osu!complete' },
+
+                    { page: 'sep' },
+
+                    { icon: 'report', label: 'Report copyright', onClick: 'showCopyrightPopup()' },
                 ];
                 %>
                 <div id="sidebar-scroll" class="scroll flex col gap-4 flex-grow">
@@ -123,6 +127,13 @@
                         <span class="icon"><%= item.icon %></span>
                         <span class="label"><%= item.label %></span>
                         <span class="icon">open_in_new</span>
+                    </a>
+
+                    <!-- Sidebar JS onClick links -->
+                    <% } else if (item.onClick) { %>
+                    <a class="btn item" data-on-click="<%= item.onClick %>">
+                        <span class="icon"><%= item.icon %></span>
+                        <span class="label"><%= item.label %></span>
                     </a>
 
                     <!-- Sidebar internal links -->
@@ -189,9 +200,9 @@
                 <!-- Static footer -->
                 <footer id="footer">
                     <p>
-                        osu!dl &copy;
-                        <a href="https://kaysting.dev">Kayla Kersting</a>
-                        2026
+                        osu!dl &copy; 2026
+                        <br />
+                        A project built with love for the osu! community
                     </p>
                 </footer>
             </div>

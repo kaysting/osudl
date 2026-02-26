@@ -1,13 +1,14 @@
 const express = require('express');
 const utils = require('#utils');
-const marked = require('marked');
 const api = require('#api');
 
 const router = express.Router();
 
-router.get('/search-filter-help', async (req, res) => {
-    res.render('partials/markdown.ejs', { path: 'filter-help.md' });
+router.get('/markdown/:mdFileName', async (req, res) => {
+    res.render('partials/markdown.ejs', { path: `${req.params.mdFileName}.md` });
 });
+
+router.get('/beatmapsets/:mapsetId/info', async (req, res) => {});
 
 router.use((req, res, next) => {
     res.status(404).end(`404 Not Found`);
