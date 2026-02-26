@@ -1,0 +1,66 @@
+<div id="home" class="flex col gap-32 justify-center align-center">
+    <div class="top flex col align-center gap-16">
+        <div class="logo">
+            <span class="white">osu!</span>
+            <div class="color">dl</div>
+        </div>
+        <div class="slogan">Search, filter, and bulk download osu! maps!</div>
+    </div>
+    <form
+        class="search flex gap-8 align-center"
+        hx-get="/beatmapsets"
+        hx-trigger="submit, input changed delay:500ms from:find input"
+        hx-push-url="true"
+        hx-select="#content"
+        hx-target="#content"
+        hx-swap="outerHTML"
+        hx-select-oob="#sidebar-scroll"
+        hx-indicator="#content"
+        style="width: 900px">
+        <div class="textbox large hasIcon flex-grow">
+            <span class="icon">search</span>
+            <input
+                type="text"
+                name="q"
+                id="inputQuery"
+                class="input"
+                placeholder="Type filters or search terms..."
+                autocapitalize="none"
+                autocomplete="off"
+                spellcheck="false"
+                maxlength="200" />
+        </div>
+        <button type="submit" class="btn primary large">
+            <span class="icon">search</span>
+            <span class="label">Start searching</span>
+        </button>
+    </form>
+</div>
+
+<style>
+    #home {
+        min-height: 100%;
+        padding: 24px 16px;
+    }
+
+    #home .top {
+        text-align: center;
+    }
+
+    #home .top .logo {
+        font-size: 54px;
+    }
+
+    #home .top .slogan {
+        font-size: 24px;
+        color: var(--c-base-60);
+    }
+
+    @media (max-width: 650px) {
+        #home .search {
+            flex-direction: column;
+            justify-content: unset;
+            align-items: unset;
+        }
+    }
+</style>
