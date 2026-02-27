@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, shell, session } = require('electron');
 
 app.whenReady().then(() => {
     const win = new BrowserWindow({
@@ -10,8 +10,17 @@ app.whenReady().then(() => {
         }
     });
 
+    // Override protected folder restrictions
+    session.defaultSession.on('file-system-access-restricted', async (event, details, callback) => {
+        callback('allow');
+    });
+
     // Override some defaults for popups opened with window.open
-    win.webContents.setWindowOpenHandler(() => {
+    win.webContents.setWindowOpenHandler(({ url }) => {
+        if (url.startsWith('http')) {
+            shell.openExternal(url);
+            return { action: 'deny' };
+        }
         return {
             action: 'allow',
             overrideBrowserWindowOptions: {
