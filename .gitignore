@@ -8,3 +8,4 @@ node_modules
 !.gitignore
 
 /apps/web/public/desktop
+/apps/desktop/output

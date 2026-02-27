@@ -96,9 +96,9 @@
                     { page: 'home', path: '/', icon: 'home', label: 'Home' },
                     { page: 'search', path: '/beatmapsets', icon: 'search', label: 'Search and filter maps' },
 
-                    { page: 'sep' },
+                    { page: 'sep', class: 'hiddenOnDesktop' },
                     
-                    { path: '/desktop/download.html', target: '_blank', icon: 'widgets', label: 'osu!dl Desktop' },
+                    { path: '/desktop/download.html', target: '_blank', icon: 'widgets', label: 'osu!dl Desktop', class: 'hiddenOnDesktop' },
 
                     { page: 'sep' },
 
@@ -120,14 +120,14 @@
 
                     <!-- Sidebar separator -->
                     <% if (item.page == 'sep') { %>
-                    <div class="separator"></div>
+                    <div class="separator <%= item.class || '' %>"></div>
 
                     <!-- Sidebar external links -->
                     <% } else if (item.target == '_blank') { %>
                     <a
                         href="<%= item.path %>"
                         target="_blank"
-                        class="btn item page <%= page == (item.page || '') ? 'active' : '' %>">
+                        class="btn item page <%= page == (item.page || '') ? 'active' : '' %> <%= item.class || '' %>">
                         <span class="icon"><%= item.icon %></span>
                         <span class="label"><%= item.label %></span>
                         <span class="icon">open_in_new</span>

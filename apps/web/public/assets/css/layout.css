@@ -477,3 +477,7 @@ img.loaded {
     font-size: 16px;
     font-weight: 600;
 }
+
+[data-is-electron="true"] .hiddenOnDesktop {
+    display: none;
+}
