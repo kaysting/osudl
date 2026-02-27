@@ -1,4 +1,5 @@
 const { app, BrowserWindow, shell, session } = require('electron');
+const path = require('path');
 
 app.whenReady().then(() => {
     const win = new BrowserWindow({
