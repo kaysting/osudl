@@ -243,6 +243,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     id: 'target',
                     mode: 'readwrite'
                 });
+
+                // Attempt to write a test file to verify write permissions
+                try {
+                    const testFileName = `.osudl-init`;
+                    const testFileHandle = await folderHandle.getFileHandle(testFileName, { create: true });
+                    const writable = await testFileHandle.createWritable();
+                    await writable.write('test');
+                    await writable.close();
+                    await folderHandle.removeEntry(testFileName);
+                } catch (err) {
+                    throw new Error('Cannot write to selected folder');
+                }
+
                 $('#controls .section.downloadToFolder .folderName').innerText = folderHandle.name;
                 $('#controls').dataset.state = 'folderSelected';
             } catch (err) {
