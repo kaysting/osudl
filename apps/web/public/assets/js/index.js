@@ -72,7 +72,7 @@ const downloadAllResults = async btn => {
     const query = btn.dataset.query;
 
     // Open popup immediately
-    const popup = openBrowserPopup(query, Date.now().toString(), 500, 600);
+    const popup = openBrowserPopup('', Date.now().toString(), 500, 600);
 
     // Create pack
     const res = await axios.post(`/api/json/packs/create?query=${encodeURIComponent(query)}`);
