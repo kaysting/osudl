@@ -103,3 +103,7 @@ const showCopyrightPopup = () => {
 const showMapsetDetailsPopup = mapsetId => {
     showRenderedPopup(`Beatmap details`, `/api/partials/beatmapsets/${mapsetId}/details`, 800);
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (window?.electronAPI?.isElectron) document.body.dataset.isElectron = 'true';
+});
