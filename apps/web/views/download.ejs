@@ -60,6 +60,7 @@
                             <span class="label">Select destination folder...</span>
                         </button>
                     </div>
+                    <div class="text danger folderSelectError"></div>
                     <div class="section downloadToFolder">
                         <div class="text">
                             Start downloading maps to
@@ -98,7 +99,6 @@
                         <a id="showZipLinks">Download as zip</a>
                         instead (not recommended)
                     </div>
-                    <div class="text danger folderSelectError"></div>
                     <div class="section zip">
                         <% if (isVideoTooBig && isNoVideoTooBig) { %>
                         <div class="text"><%= tooBigMessage %></div>
