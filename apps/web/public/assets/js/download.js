@@ -142,6 +142,8 @@ const startDirectDownload = async includeVideo => {
             // Try to download the file until it succeeds
             while (true) {
                 try {
+                    if ($('#cancel').disabled) break;
+
                     // Create file for writing
                     const tempFileName = `${fileName}.part`;
                     const fileHandle = await folderHandle.getFileHandle(tempFileName, { create: true });
@@ -158,6 +160,7 @@ const startDirectDownload = async includeVideo => {
 
                     // Move to final name
                     fileHandle.move(fileName);
+                    countDownloaded++;
 
                     // Update and break
                     updateProgress();
@@ -169,13 +172,12 @@ const startDirectDownload = async includeVideo => {
                     // Update progress, log, and wait to retry
                     updateProgress();
                     updateUI('log', {
-                        message: `Download failed, will try again: ${fileName}`,
+                        message: `Download failed, trying again in 5s: ${fileName}`,
                         log_status: 'error'
                     });
                     await sleep(5000);
                 }
             }
-            countDownloaded++;
         };
 
         // Loop until we exhaust the list of maps
