@@ -209,6 +209,20 @@ router.post('/:packId/download/:downloadId/cancel', ensurePackExists, ensureDown
     res.json({ success: true });
 });
 
+// Update download instance and pack info on an interval
+// This stops us from slamming the database with updates on every download request
+const unsavedDownloads = {};
+const saveDownloadProgress = () => {
+    if (Object.keys(unsavedDownloads).length == 0) return;
+    for (const downloadId in unsavedDownloads) {
+        const countToIncrement = unsavedDownloads[downloadId];
+        delete unsavedDownloads[downloadId];
+        packsApi.incrementPackDownloadInstanceMapCount(downloadId, countToIncrement);
+        packsApi.incrementPackDownloadCountWithInstance(downloadId);
+    }
+};
+setInterval(saveDownloadProgress, 1000 * 10);
+
 // Redirect to the download for a specific map
 // We use this endpoint to attribute the map download to the pack
 // This lets us track download progress even with fully client-side downloads
@@ -230,8 +244,10 @@ router.get(
 
         // Update download instance and pack entries if this isn't a retry
         if (!isRetry) {
-            packsApi.incrementPackDownloadInstanceMapCount(req.downloadInstance.id);
-            packsApi.incrementPackDownloadCountWithInstance(req.downloadInstance.id);
+            if (!unsavedDownloads[req.downloadInstance.id]) {
+                unsavedDownloads[req.downloadInstance.id] = 0;
+            }
+            unsavedDownloads[req.downloadInstance.id]++;
         }
 
         // Redirect to the download
