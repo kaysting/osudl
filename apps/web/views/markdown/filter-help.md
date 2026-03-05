@@ -27,10 +27,12 @@ These keys accept any text string. You can enclose the value in quotes (`"freedo
 
 - `title`: Song title
 - `artist`: Song artist
-- `diff`, or `version`: Difficulty name
 - `genre`: Song genre
 - `source`: Song source
-- `tags`: Map tags
+- `language` or `lang`: Song language
+- `mapper` or `creator`: Mapper
+- `diff`, or `version`: Difficulty name
+- `tags` or `tag`: Map tag(s)
 
 **True/false keys**  
 These keys accept true or false values like `true`, `false`, `t`, `f`, `yes`, `no`, `y`, `n`, `1`, `0`.
