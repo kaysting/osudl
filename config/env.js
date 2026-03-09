@@ -7,7 +7,7 @@ const env = {};
 env.ROOT = path.resolve(__dirname, '..');
 
 /** An absolute path to the SQLite database file. */
-env.DB_PATH = process.env.DB_PATH || path.join(env.ROOT, 'database/osudl.db');
+env.DB_PATH = process.env.DB_PATH ?? path.join(env.ROOT, 'database/osudl.db');
 
 /** osu! API client ID. */
 env.OSU_CLIENT_ID = process.env.OSU_CLIENT_ID;
@@ -18,7 +18,7 @@ env.OSU_CLIENT_SECRET = process.env.OSU_CLIENT_SECRET;
  *
  * Find this in your browser's devtools.
  *
- * **IMPORTANT:** In your user settings, set "default beatmap download type" to "with video if available"
+ * **IMPORTANT:** In your user settings, set "default beatmap download type" to "with video if available"!
  */
 env.OSU_SESSION_COOKIE = process.env.OSU_SESSION_COOKIE;
 
@@ -35,7 +35,7 @@ env.S3_SECRET_KEY = process.env.S3_SECRET_KEY;
  *
  * Required for Amazon S3 but the default 'auto' should be fine everywhere else.
  */
-env.S3_REGION = process.env.S3_REGION || 'auto';
+env.S3_REGION = process.env.S3_REGION ?? 'auto';
 /**
  * Force path style for S3.
  *
@@ -43,17 +43,22 @@ env.S3_REGION = process.env.S3_REGION || 'auto';
  */
 env.S3_FORCE_PATH_STYLE = process.env.S3_FORCE_PATH_STYLE === 'true';
 
-/** Webserver part */
-env.PORT = process.env.PORT || 8080;
-/** Whether or not the server is accessible over HTTPS */
+/** Webserver part. */
+env.PORT = process.env.PORT ?? 8080;
+/** Whether or not the server is accessible over HTTPS. */
 env.HTTPS = process.env.HTTPS ? true : false;
-/** The host that leads to the webserver */
-env.HOST = process.env.HOST || `localhost:${env.PORT}`;
-/** The base URL compiled from PORT, HTTPS, and HOST */
+/** The host that leads to the webserver. */
+env.HOST = process.env.HOST ?? `localhost:${env.PORT}`;
+/** The base URL compiled from PORT, HTTPS, and HOST. */
 env.BASE_URL = `http${env.HTTPS ? 's' : ''}://${env.HOST}`;
 
-/** The maximum size in bytes a zip download can be */
-env.MAX_ZIP_SIZE = (process.env.MAX_ZIP_SIZE_GB || 25) * 1024 * 1024 * 1024;
+/** The maximum size in bytes a zip download can be. */
+env.MAX_ZIP_SIZE = (process.env.MAX_ZIP_SIZE_GB ?? 25) * 1024 * 1024 * 1024;
+
+/** The URL to download mapsets from, with a `{mapset_id}` placeholder that gets replaced with the target mapset ID. Defaults to the osu! servers. */
+env.MAP_DOWNLOAD_TEMPLATE = process.env.MAP_DOWNLOAD_TEMPLATE ?? `https://osu.ppy.sh/beatmapsets/{mapset_id}/download`;
+/** The time in milliseconds to wait between mapset downloads to compensate for rate limits. */
+env.MS_DELAY_BETWEEN_DOWNLOADS = process.env.MS_DELAY_BETWEEN_DOWNLOADS ?? 5000;
 
 let isMissingRequired = false;
 for (const [key, value] of Object.entries(env)) {
