@@ -33,6 +33,28 @@ router.post('/packs/create', async (req, res) => {
     });
 });
 
+let cachedMapsetIds = [];
+let cachedMapIds = [];
+let timeCachedMapsetIds = 0;
+let timeCachedMapIds = 0;
+let idCacheTTLMs = 1000 * 15;
+
+router.get('/beatmapset-ids', (req, res) => {
+    if (Date.now() - timeCachedMapsetIds > idCacheTTLMs) {
+        cachedMapsetIds = api.getMapsetIds();
+        timeCachedMapsetIds = Date.now();
+    }
+    res.json(cachedMapsetIds);
+});
+
+router.get('/beatmap-ids', (req, res) => {
+    if (Date.now() - timeCachedMapIds > idCacheTTLMs) {
+        cachedMapIds = api.getMapsetIds();
+        timeCachedMapIds = Date.now();
+    }
+    res.json(cachedMapIds);
+});
+
 router.use((err, req, res, next) => {
     utils.logErr(err);
     res.status(500).json({
