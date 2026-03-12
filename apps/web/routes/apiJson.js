@@ -49,7 +49,7 @@ router.get('/beatmapset-ids', (req, res) => {
 
 router.get('/beatmap-ids', (req, res) => {
     if (Date.now() - timeCachedMapIds > idCacheTTLMs) {
-        cachedMapIds = api.getMapsetIds();
+        cachedMapIds = api.getMapIds();
         timeCachedMapIds = Date.now();
     }
     res.json(cachedMapIds);
