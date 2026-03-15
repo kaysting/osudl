@@ -6,10 +6,6 @@
     hx-target="#results"
     hx-select-oob="#downloadAllCont, #status"
     hx-indicator="#results, #downloadAllCont .btn">
-    <!-- Hidden inputs for sort and page -->
-    <input type="hidden" name="s" value="<%= search.sort %>" />
-    <input type="hidden" name="p" value="<%= search.page %>" />
-
     <!-- Header for search bar -->
     <div id="searchHeader" class="flex col gap-8">
         <div class="textbox medium hasIcon flex-grow">
@@ -46,6 +42,9 @@
         <!-- Results navigation with sort and pagination buttons -->
         <div id="resultsNav" class="flex gap-8 flex-wrap align-end">
             <div class="section" id="mapSort">
+                <!-- Hidden inputs for sort and page -->
+                <input type="hidden" name="s" value="<%= search.sort %>" />
+                <input type="hidden" name="p" value="<%= search.page %>" />
                 <div class="icon flex-no-shrink">sort</div>
                 <div class="flex flex-wrap gap-4">
                     <!-- prettier-ignore -->
