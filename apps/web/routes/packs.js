@@ -12,14 +12,16 @@ const env = require('#env');
 const router = express.Router();
 
 // Middleware to make sure the requested pack exists
-const ensurePackExists = (req, res, next) => {
-    const packId = req.params.packId;
-    req.pack = packsApi.getPack(packId);
-    if (!req.pack) {
-        return res.status(404).end(`Pack ${packId} doesn't exist :(`);
-    }
-    next();
-};
+const ensurePackExists =
+    (withSize = true) =>
+    (req, res, next) => {
+        const packId = req.params.packId;
+        req.pack = packsApi.getPack(packId);
+        if (!req.pack) {
+            return res.status(404).end(`Pack ${packId} doesn't exist :(`);
+        }
+        next();
+    };
 
 // Middleware to make sure the requested download entry exists
 const ensureDownloadExists = (req, res, next) => {
@@ -37,13 +39,13 @@ router.get('/', async (req, res) => {
 });
 
 // Pack info page
-router.get('/:packId', ensurePackExists, async (req, res) => {
+router.get('/:packId', ensurePackExists(), async (req, res) => {
     res.end(`Not implemented, check back later`);
 });
 
 // Paginated JSON map data list
 // Used on the download page to show progress for each map
-router.get('/:packId/beatmapsets', ensurePackExists, async (req, res) => {
+router.get('/:packId/beatmapsets', ensurePackExists(false), async (req, res) => {
     const limit = utils.clamp(parseInt(req.query.limit) || 100, 1, 100);
     const offset = Math.max(parseInt(req.query.offset) || 0, 0);
     const result = packsApi.getPackContents(req.pack.id, 'ranked_asc', limit, offset);
@@ -53,13 +55,13 @@ router.get('/:packId/beatmapsets', ensurePackExists, async (req, res) => {
 // Initialize a pack download
 // Creates a download entry and redirects to the download page for it
 // This is how we can show progress specific to a single download instance
-router.get('/:packId/download', ensurePackExists, async (req, res) => {
+router.get('/:packId/download', ensurePackExists(false), async (req, res) => {
     const downloadId = packsApi.initPackDownload(req.pack.id, req.user?.id);
     res.redirect(`/packs/${req.pack.id}/download/${downloadId}`);
 });
 
 // Pack download page
-router.get('/:packId/download/:downloadId', ensurePackExists, ensureDownloadExists, async (req, res) => {
+router.get('/:packId/download/:downloadId', ensurePackExists(), ensureDownloadExists, async (req, res) => {
     res.render('download', {
         download: req.downloadInstance
     });
@@ -67,7 +69,7 @@ router.get('/:packId/download/:downloadId', ensurePackExists, ensureDownloadExis
 
 // Pack download as streamed zip
 const cancelledDownloadIds = new Set();
-router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownloadExists, async (req, res) => {
+router.get('/:packId/download/:downloadId/zip', ensurePackExists(), ensureDownloadExists, async (req, res) => {
     // Get video setting
     const includeVideo = req.query.video === 'false' ? false : true;
 
@@ -204,7 +206,7 @@ router.get('/:packId/download/:downloadId/zip', ensurePackExists, ensureDownload
 });
 
 // Mark download as cancelled
-router.post('/:packId/download/:downloadId/cancel', ensurePackExists, ensureDownloadExists, async (req, res) => {
+router.post('/:packId/download/:downloadId/cancel', ensurePackExists(false), ensureDownloadExists, async (req, res) => {
     cancelledDownloadIds.add(req.downloadInstance.id);
     res.json({ success: true });
 });
@@ -228,7 +230,7 @@ setInterval(saveDownloadProgress, 1000 * 10);
 // This lets us track download progress even with fully client-side downloads
 router.get(
     '/:packId/download/:downloadId/beatmapset/:mapsetId',
-    ensurePackExists,
+    ensurePackExists(false),
     ensureDownloadExists,
     async (req, res) => {
         // Get inputs
