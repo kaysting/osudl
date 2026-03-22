@@ -124,3 +124,5 @@ app.use((err, req, res, next) => {
 utils.initGracefulShutdown(() => {
     db.close();
 });
+
+utils.logToDiscord('Webserver started');
