@@ -40,6 +40,7 @@ app.use((req, res, next) => {
     };
 
     // Log request including processing time
+    /*
     const START_TIME = process.hrtime.bigint();
     const originalEnd = res.end;
     res.end = function (...args) {
@@ -48,7 +49,8 @@ app.use((req, res, next) => {
         const logParts = [ip, req.method, status, req.originalUrl, `[${elapsed}ms]`];
         utils.log(...logParts);
         return originalEnd.apply(this, args);
-    };
+    }; */
+    utils.log(ip, req.method, req.originalUrl);
 
     // Request renderer
     res.renderPage = (page, data) => {
