@@ -40,16 +40,13 @@ app.use((req, res, next) => {
     };
 
     // Log request including processing time
-    /*
     const START_TIME = process.hrtime.bigint();
     const originalEnd = res.end;
     res.end = function (...args) {
         const elapsed = (Number(process.hrtime.bigint() - START_TIME) / 1_000_000).toFixed(2);
-        const status = res.statusCode;
-        const logParts = [ip, req.method, status, req.originalUrl, `[${elapsed}ms]`];
-        utils.log(...logParts);
+        if (elapsed > 500) req.log(`WARNING: Request took ${elapsed}ms`);
         return originalEnd.apply(this, args);
-    }; */
+    };
     utils.log(ip, req.method, req.originalUrl);
 
     // Request renderer
