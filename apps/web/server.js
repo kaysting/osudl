@@ -20,6 +20,7 @@ const io = socketIo(server, {
 // Start HTTP server
 server.listen(env.PORT, () => {
     utils.log(`Webserver listening on port ${env.PORT}`);
+    utils.logToDiscord('Webserver started');
 });
 
 module.exports = {
