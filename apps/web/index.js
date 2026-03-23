@@ -40,7 +40,6 @@ app.use((req, res, next) => {
     };
     req.logErr = (...args) => {
         utils.logErr(ip, req.method, `${req.originalUrl}:`, ...args);
-        utils.logToDiscord(`${req.method} ${req.originalUrl}:`, ...args);
     };
 
     // Log request including processing time
