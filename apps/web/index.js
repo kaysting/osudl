@@ -47,7 +47,7 @@ app.use((req, res, next) => {
     const originalEnd = res.end;
     res.end = function (...args) {
         const elapsed = (Number(process.hrtime.bigint() - START_TIME) / 1_000_000).toFixed(2);
-        if (elapsed > 500) {
+        if (elapsed > 1000) {
             req.logErr(`WARNING: Request took ${elapsed}ms`);
         }
         return originalEnd.apply(this, args);
