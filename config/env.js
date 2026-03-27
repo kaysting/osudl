@@ -61,11 +61,11 @@ env.MAP_DOWNLOAD_TEMPLATE = process.env.MAP_DOWNLOAD_TEMPLATE ?? `https://osu.pp
 env.MS_DELAY_BETWEEN_DOWNLOADS = process.env.MS_DELAY_BETWEEN_DOWNLOADS ?? 5000;
 
 /** A Discord webhook link to send log messages to. */
-env.DISCORD_LOGS_WEBHOOK = process.env.DISCORD_LOGS_WEBHOOK;
+env.DISCORD_LOGS_WEBHOOK = process.env.DISCORD_LOGS_WEBHOOK || '';
 
 let isMissingRequired = false;
 for (const [key, value] of Object.entries(env)) {
-    if (value === '' || value === null || value === undefined) {
+    if (value === null || value === undefined) {
         console.error(`Environment variable ${key} is required`);
         isMissingRequired = true;
     }
