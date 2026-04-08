@@ -1,5 +1,12 @@
 {
-    "name": "osudl-desktop",
-    "version": "1.0.0",
-    "main": "main.js"
+  "name": "osudl-desktop",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "build": "asar pack . osudl.asar"
+  },
+  "devDependencies": {
+    "@electron/asar": "^3.2.0",
+    "electron": "^41.1.0"
+  }
 }
