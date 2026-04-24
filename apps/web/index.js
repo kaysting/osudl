@@ -50,7 +50,7 @@ app.use((req, res, next) => {
         const status = res.statusCode;
         const logParts = [ip, req.method, status, req.originalUrl, `[${elapsed}ms]`];
         //utils.log(...logParts);
-        if (elapsed > 1000) {
+        if (elapsed > 5000) {
             req.logErr(`WARNING: Request took ${elapsed}ms`);
         }
         return originalEnd.apply(this, args);
