@@ -18,7 +18,7 @@ const checkOsuAccessibility = async () => {
         if (isOsuOnline) {
             utils.log(`osu! API is online`);
         } else {
-            utils.logError(
+            utils.logErr(
                 `osu! API is currently inaccessible (error ${statusCode}), updates will be delayed until access is restored`
             );
         }
