@@ -70,7 +70,7 @@ const runRecentScan = async () => {
 
 (async () => {
     // Check osu API status
-    await checkOsuAccessibility();
+    await pokeOsuApi();
 
     // Start these immediately
     runImport();
