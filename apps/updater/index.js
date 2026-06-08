@@ -23,7 +23,7 @@ const checkOsuAccessibility = async () => {
             );
         }
     }
-    setTimeout(checkOsuAccessibility, 1000 * 60);
+    setTimeout(checkOsuAccessibility, 1000 * 60 * 10);
     return isOsuOnline;
 };
 
