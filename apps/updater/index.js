@@ -1,14 +1,15 @@
 const db = require('#db');
 const utils = require('#utils');
 const ingest = require('#api/ingest.js');
+const osu = require('#lib/osu.js');
 
 const axios = require('axios');
 let isOsuOnline = null;
-const checkOsuAccessibility = async () => {
+const pokeOsuApi = async () => {
     const oldStatus = isOsuOnline;
     let statusCode = null;
     try {
-        await axios.get('https://osu.ppy.sh/api/v2/auth/token');
+        await osu.getUser(2);
         isOsuOnline = true;
     } catch (error) {
         statusCode = error.response?.status;
@@ -17,13 +18,16 @@ const checkOsuAccessibility = async () => {
     if (oldStatus !== isOsuOnline) {
         if (isOsuOnline) {
             utils.log(`osu! API is online`);
+            if (oldStatus === false) {
+                utils.logError(`osu! API access has been restored!`);
+            }
         } else {
             utils.logErr(
                 `osu! API is currently inaccessible (error ${statusCode}), updates will be delayed until access is restored`
             );
         }
     }
-    setTimeout(checkOsuAccessibility, 1000 * 60);
+    setTimeout(pokeOsuApi, 1000 * 60);
     return isOsuOnline;
 };
 
