@@ -30,7 +30,7 @@ const pokeOsuApi = async () => {
                 utils.logError(`osu! API access has been restored!`);
             }
         } else {
-            utils.logError(
+            utils.logErr(
                 `osu! API is currently inaccessible, updates will be delayed until access is restored: ${errorText}`
             );
         }
