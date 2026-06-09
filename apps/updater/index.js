@@ -7,7 +7,7 @@ const axios = require('axios');
 let isOsuOnline = null;
 const pokeOsuApi = async () => {
     const oldStatus = isOsuOnline;
-    let statusCode = null;
+    let errorText = 'unknown error';
     try {
         const token = await osu.getToken();
         await axios.get('https://osu.ppy.sh/api/v2/users/2', {
@@ -20,9 +20,8 @@ const pokeOsuApi = async () => {
         });
         isOsuOnline = true;
     } catch (error) {
-        console.log(error);
-        statusCode = error.response?.status;
-        isOsuOnline = statusCode === 401;
+        isOsuOnline = error.response?.status === 401;
+        errorText = `${error.toString()}`;
     }
     if (oldStatus !== isOsuOnline) {
         if (isOsuOnline) {
@@ -31,12 +30,12 @@ const pokeOsuApi = async () => {
                 utils.logError(`osu! API access has been restored!`);
             }
         } else {
-            utils.logErr(
-                `osu! API is currently inaccessible (error ${statusCode}), updates will be delayed until access is restored`
+            utils.logError(
+                `osu! API is currently inaccessible, updates will be delayed until access is restored: ${errorText}`
             );
         }
     }
-    setTimeout(pokeOsuApi, 1000 * 60);
+    setTimeout(pokeOsuApi, 1000 * 60 * 5);
     return isOsuOnline;
 };
 
